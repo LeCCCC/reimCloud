@@ -20,4 +20,14 @@ public interface FkReimMainMapper {
      * 统计符合条件的总条数
      */
     long countByQuery(@Param("query") TravelReimbursementQueryDTO query);
+
+    /**
+     * 根据主键ID查询报销单
+     */
+    FkReimMain selectById(@Param("id") String id);
+
+    /**
+     * 更新单据状态
+     */
+    int updateBillStatus(@Param("id") String id, @Param("billStatus") String billStatus);
 }

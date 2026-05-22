@@ -44,4 +44,12 @@
         <include refid="queryConditions"/>
     </select>
 
+    <select id="selectById" resultType="org.example.reimcloud.entity.FkReimMain">
+        SELECT * FROM fk_reim_main WHERE id = #{id}
+    </select>
+
+    <update id="updateBillStatus">
+        UPDATE fk_reim_main SET bill_status = #{billStatus} WHERE id = #{id}
+    </update>
+
 </mapper>

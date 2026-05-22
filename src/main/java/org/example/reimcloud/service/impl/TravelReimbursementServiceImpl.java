@@ -18,8 +18,11 @@ import org.example.reimcloud.mapper.ReimCompanyMapper;
 import org.example.reimcloud.mapper.ReimDepartmentMapper;
 import org.example.reimcloud.service.TravelReimbursementService;
 import org.example.reimcloud.vo.BusinessTypeVO;
+import org.example.reimcloud.vo.CostSummaryVO;
 import org.example.reimcloud.vo.PageVO;
+import org.example.reimcloud.vo.TravelReimbursementDetailVO;
 import org.example.reimcloud.vo.TravelReimbursementListVO;
+import org.example.reimcloud.vo.VoidResultVO;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -54,6 +57,57 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
                 .current((long) current)
                 .size((long) size)
                 .records(records)
+                .build();
+    }
+
+    @Override
+    public TravelReimbursementDetailVO getDetail(String id) {
+        FkReimMain entity = fkReimMainMapper.selectById(id);
+        if (entity == null) {
+            return null;
+        }
+        return TravelReimbursementDetailVO.builder()
+                .id(entity.getId())
+                .billNo(entity.getBillNo())
+                .billStatus(entity.getBillStatus())
+                .creationTime(entity.getCreationTime() != null ? entity.getCreationTime().toString() : null)
+                .reimbursementTitle(entity.getReimbursementTitle())
+                .businessTripReason(entity.getBusinessTripReason())
+                .reimburserId(entity.getReimburserId())
+                .reimburserNo(entity.getReimburserNo())
+                .reimburserName(entity.getReimburserName())
+                .reimDepartmentId(entity.getReimDepartmentId())
+                .reimDepartmentName(entity.getReimDepartmentName())
+                .reimCompanyId(entity.getReimCompanyId())
+                .reimCompanyName(entity.getReimCompanyName())
+                .businessTypeId(entity.getBusinessTypeId())
+                .businessTypeName(entity.getBusinessTypeName())
+                .tripList(new ArrayList<>())
+                .subsidyList(new ArrayList<>())
+                .costSummary(CostSummaryVO.builder()
+                        .subsidyTotal(entity.getSubsidyTotal())
+                        .mealAllowance(entity.getMealAllowance())
+                        .transportationAllowance(entity.getTransportationAllowance())
+                        .phoneAllowance(entity.getPhoneAllowance())
+                        .build())
+                .allocationList(new ArrayList<>())
+                .remarks(entity.getRemarks())
+                .build();
+    }
+
+    @Override
+    public VoidResultVO voidReimbursement(String id) {
+        FkReimMain entity = fkReimMainMapper.selectById(id);
+        if (entity == null) {
+            return null;
+        }
+        if ("2".equals(entity.getBillStatus())) {
+            throw new IllegalStateException("该报销单已作废，不可重复作废");
+        }
+        fkReimMainMapper.updateBillStatus(id, "2");
+        return VoidResultVO.builder()
+                .id(id)
+                .billStatus("2")
                 .build();
     }
 
