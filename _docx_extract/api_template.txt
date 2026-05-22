@@ -1,0 +1,70 @@
+# API接口接口文档模版.docx
+
+## Paragraphs
+
+P0000 [Title]: 胜意承兑汇票接口
+P0001 [Heading 2]: 1.汇票管理
+P0002 [Heading 2]: 1.1查询承兑汇票信息分页列表
+P0003 [Normal]: 接口调用地址：ip+端口+/b2c/train
+P0004 [Normal]: 方法名:TRAIN_B2C_matchTrainBx
+P0005 [Normal]: 匹配火车票保险及服务费 应用场景： 后台会根据火车票票价来进行保险的绑定和服务费的收取，不同的价格段的设置是不同的，此接口是在用户选择座位后，将价格传入接口，接口来匹配对应的保险及服务费信息
+P0006 [Normal]: 接口路径:fcecf/fccapi/COMM_B2G_QueryAcceptanceBillPageList
+P0007 [Normal]: 接口入参：
+P0013 [Normal]: 接口出参：
+
+## Tables
+
+### Table 0 rows=15 cols=5
+R0: 字段名 | 类型 | 是否必传 | 备注 | 格式
+R1: current | Integer | Y | 当前页，默认1 | 
+R2: size | Integer | Y | 每页大小，默认10 | 
+R3: data | QueryAcceptanceBillPageListData | Y | 获取列表服务传参 | 
+R4: QueryAcceptanceBillPageListData | QueryAcceptanceBillPageListData | QueryAcceptanceBillPageListData | QueryAcceptanceBillPageListData | QueryAcceptanceBillPageListData
+R5: queryDateType | String | Y | 查询日期类型 | 查询日期类型  0创建时间 1出票日期 2到期日期 3接收日期 4最后更新日期 默认0
+R6: queryStartDateStr | String | Y | 查询开始时间 | yyyy-MM-dd
+R7: queryEndDateStr | String | Y | 查询结束时间 | yyyy-MM-dd
+R8: legalCompCode | String | Y | 法人公司编号 | 多选逗号拼接
+R9: ticketNo | String | Y | 票号 | 
+R10: draftType | String | Y | 汇票类型 | 多选逗号拼接 / 1银行承兑汇票 2商业承兑汇票 / 3供应链 / 4建信通融 / 5工银e信
+R11: billingMethod | String | Y | 开票方式 | 1自开票 2背书汇票
+R12: acceptCompCode | String | Y | 承兑公司编号 | 多选逗号拼接
+R13: ticketStatus | String | Y | 票据状态 | 1待承兑 2部分承兑 3全额承兑
+R14: paymentBillNo | String | Y | 付款单号 | 
+### Table 1 rows=37 cols=5
+R0: 字段名 | 类型 | 是否必传 | 备注 | 格式
+R1: total | Integer | Y | 总条数 | 
+R2: pages | Integer | Y | 总页数 | 
+R3: current | Integer | Y | 当前页 | 
+R4: size | Integer | Y | 每页大小 | 
+R5: records | List<QueryAcceptanceBillPageListBean> | Y | 汇票信息集合 | subTotal 小计对象，total合计对象，金额字段参看列表字段名不变，faceAmount
+R6: condition | Map<String, Object> | Y | 小计合计独享 | 
+R7: QueryAcceptanceBillPageListBean信息集合 | QueryAcceptanceBillPageListBean信息集合 | QueryAcceptanceBillPageListBean信息集合 | QueryAcceptanceBillPageListBean信息集合 | QueryAcceptanceBillPageListBean信息集合
+R8: id | String | Y | 主键id | 
+R9: legalCompId | String | Y | 法人公司id | 
+R10: legalCompCode | String | Y | 法人公司编号 | 
+R11: legalCompName | String | Y | 法人公司名称 | 
+R12: ticketNo | String | Y | 票号 | 
+R13: issueDate | String | Y | 出票日期 | yyyy-MM-dd HH:mm:ss
+R14: expirationDate | String | Y | 到期日期 | yyyy-MM-dd HH:mm:ss
+R15: receivedDate | String | Y | 接收日期 | 
+R16: draftType | String | Y | 汇票类型 | 1银行承兑汇票 2商业承兑汇票
+R17: draftTypeName | String | Y | 汇票类型名称 | 
+R18: acceptingBank | String | Y | 承兑银行 | 
+R19: billingMethod | String | Y | 开票方式 | 1自开票 2背书汇票
+R20: billingMethodName | String | Y | 开票方式名称 | 
+R21: acceptCompId | String | Y | 承兑公司id | 
+R22: acceptCompCode | String | Y | 承兑公司编号 | 
+R23: acceptCompName | String | Y | 承兑公司名称 | 
+R24: ticketStatus | String | Y | 票据状态 | 1待承兑 2部分承兑 3全额承兑
+R25: ticketStatusName | String | Y | 票据状态名称 | 
+R26: expirationStatus | String | Y | 到期状态 | 
+R27: faceAmount | String | Y | 票面金额 | 
+R28: balance | String | Y | 余额 | 
+R29: underAcceptanceAmount | String | Y | 承兑中金额 | 
+R30: acceptedAmount | String | Y | 已承兑金额 | 
+R31: createUserCode | String | Y | 创建人工号 | 
+R32: createUserName | String | Y | 创建人姓名 | 
+R33: createTime | Date | Y | 创建时间 | yyyy-MM-dd HH:mm:ss /
+R34: updateUserCode | String | Y | 最后更新人工号 | 
+R35: updateUserName | String | Y | 最后更新人姓名 | 
+R36: updateTime | Date | Y | 最后更新时间 | yyyy-MM-dd HH:mm:ss /
