@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.reimcloud.mapper.FkReimMainMapper">
+
+    <sql id="queryConditions">
+        <where>
+            <if test="query.billNo != null and query.billNo != ''">
+                AND m.bill_no LIKE CONCAT('%', #{query.billNo}, '%')
+            </if>
+            <if test="query.reimbursementTitle != null and query.reimbursementTitle != ''">
+                AND m.reimbursement_title LIKE CONCAT('%', #{query.reimbursementTitle}, '%')
+            </if>
+            <if test="query.businessTripReason != null and query.businessTripReason != ''">
+                AND m.business_trip_reason LIKE CONCAT('%', #{query.businessTripReason}, '%')
+            </if>
+            <if test="query.reimCompanyId != null and query.reimCompanyId != ''">
+                AND m.reim_company_id = #{query.reimCompanyId}
+            </if>
+            <if test="query.reimDepartmentId != null and query.reimDepartmentId != ''">
+                AND m.reim_department_id = #{query.reimDepartmentId}
+            </if>
+            <if test="query.reimburserId != null and query.reimburserId != ''">
+                AND m.reimburser_id = #{query.reimburserId}
+            </if>
+            <if test="query.businessTypeId != null and query.businessTypeId != ''">
+                AND m.business_type_id = #{query.businessTypeId}
+            </if>
+            <if test="query.billStatus != null and query.billStatus != ''">
+                AND m.bill_status = #{query.billStatus}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectPage" resultType="org.example.reimcloud.entity.FkReimMain">
+        SELECT * FROM fk_reim_main m
+        <include refid="queryConditions"/>
+        ORDER BY m.creation_time DESC
+        LIMIT #{offset}, #{query.size}
+    </select>
+
+    <select id="countByQuery" resultType="long">
+        SELECT COUNT(*) FROM fk_reim_main m
+        <include refid="queryConditions"/>
+    </select>
+
+</mapper>
