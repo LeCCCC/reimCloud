@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.reimcloud.mapper.BaseDataMapper">
+
+    <select id="listReimCompanies" resultType="org.example.reimcloud.vo.BaseDataVO">
+        select id, company_no as no, company_name as name
+        from reim_company
+        where #{keyword} is null or #{keyword} = ''
+           or company_no like concat('%', #{keyword}, '%')
+           or company_name like concat('%', #{keyword}, '%')
+        order by company_no
+    </select>
+
+    <select id="listReimDepartments" resultType="org.example.reimcloud.vo.BaseDataVO">
+        select id, department_no as no, department_name as name
+        from reim_department
+        where #{keyword} is null or #{keyword} = ''
+           or department_no like concat('%', #{keyword}, '%')
+           or department_name like concat('%', #{keyword}, '%')
+        order by department_no
+    </select>
+
+    <select id="listEmployees" resultType="org.example.reimcloud.vo.EmployeeVO">
+        select id as reimburserId,
+               employee_no as reimburserNo,
+               employee_name as reimburserName
+        from employee
+        where #{keyword} is null or #{keyword} = ''
+           or employee_no like concat('%', #{keyword}, '%')
+           or employee_name like concat('%', #{keyword}, '%')
+        order by employee_no
+    </select>
+
+    <select id="listBusinessTypes" resultType="org.example.reimcloud.vo.BusinessTypeVO">
+        select id as businessTypeId,
+               business_type_no as businessTypeNo,
+               business_type_name as businessTypeName,
+               there_subordinate_node as thereSubordinateNode,
+               superior_id as superiorId
+        from business_type
+        where #{superiorId} is null or #{superiorId} = '' or superior_id = #{superiorId}
+        order by business_type_no
+    </select>
+
+    <select id="listCities" resultType="org.example.reimcloud.vo.CityVO">
+        select city_no as cityNo, city_name as cityName, city_type as cityType
+        from city
+        where #{keyword} is null or #{keyword} = ''
+           or city_no like concat('%', #{keyword}, '%')
+           or city_name like concat('%', #{keyword}, '%')
+        order by city_no
+    </select>
+
+    <select id="listProjects" resultType="org.example.reimcloud.vo.ProjectVO">
+        select id as projectId, project_no as projectNo, project_name as projectName
+        from project
+        where #{keyword} is null or #{keyword} = ''
+           or project_no like concat('%', #{keyword}, '%')
+           or project_name like concat('%', #{keyword}, '%')
+        order by project_no
+    </select>
+
+    <select id="findCityType" resultType="java.lang.String">
+        select city_type
+        from city
+        where city_no = #{cityNo}
+        limit 1
+    </select>
+</mapper>
