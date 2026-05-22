@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TravelReimbursementUpdateResult {
-
     private String id;
     private String billStatus;
     private String updateTime;

@@ -11,7 +11,9 @@ public interface SubsidyCalendarMapper {
 
     int insert(SubsidyCalendar calendar);
 
-    int deleteByMainId(@Param("mainId") String mainId);
-
     List<SubsidyCalendar> selectBySubsidyId(@Param("subsidyId") String subsidyId);
+
+    int update(SubsidyCalendar calendar);
+
+    int deleteByMainId(@Param("mainId") String mainId);
 }

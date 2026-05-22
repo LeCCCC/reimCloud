@@ -11,7 +11,11 @@ public interface ReimSubsidyMapper {
 
     int insert(ReimSubsidy subsidy);
 
-    int deleteByMainId(@Param("mainId") String mainId);
-
     List<ReimSubsidy> selectByMainId(@Param("mainId") String mainId);
+
+    ReimSubsidy selectById(@Param("id") String id);
+
+    int update(ReimSubsidy subsidy);
+
+    int deleteByMainId(@Param("mainId") String mainId);
 }

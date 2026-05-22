@@ -1,60 +1,36 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.reimcloud.mapper.SubsidyCalendarMapper">
 
-    <resultMap id="SubsidyCalendarMap" type="org.example.reimcloud.entity.SubsidyCalendar">
-        <id column="id" property="id"/>
-        <result column="subsidy_id" property="subsidyId"/>
-        <result column="travel_date" property="travelDate"/>
-        <result column="travel_date_week" property="travelDateWeek"/>
-        <result column="subsidized_cities" property="subsidizedCities"/>
-        <result column="subsidized_city_number" property="subsidizedCityNumber"/>
-        <result column="city_type" property="cityType"/>
-        <result column="standard_meal_expenses_amount" property="standardMealExpensesAmount"/>
-        <result column="standard_traffic_amount" property="standardTrafficAmount"/>
-        <result column="standard_communication_amount" property="standardCommunicationAmount"/>
-        <result column="meal_expenses_amount" property="mealExpensesAmount"/>
-        <result column="traffic_amount" property="trafficAmount"/>
-        <result column="communication_amount" property="communicationAmount"/>
-        <result column="meal_selected" property="mealSelected"/>
-        <result column="traffic_selected" property="trafficSelected"/>
-        <result column="communication_selected" property="communicationSelected"/>
-    </resultMap>
-
-    <insert id="insert" parameterType="org.example.reimcloud.entity.SubsidyCalendar">
-        insert into fk_subsidy_calendar (
-            id, subsidy_id, travel_date, travel_date_week,
-            subsidized_cities, subsidized_city_number, city_type,
-            standard_meal_expenses_amount, standard_traffic_amount,
-            standard_communication_amount, meal_expenses_amount,
-            traffic_amount, communication_amount,
-            meal_selected, traffic_selected, communication_selected
-        ) values (
-            #{id}, #{subsidyId}, #{travelDate}, #{travelDateWeek},
-            #{subsidizedCities}, #{subsidizedCityNumber}, #{cityType},
-            #{standardMealExpensesAmount}, #{standardTrafficAmount},
-            #{standardCommunicationAmount}, #{mealExpensesAmount},
-            #{trafficAmount}, #{communicationAmount},
-            #{mealSelected}, #{trafficSelected}, #{communicationSelected}
-        )
+    <insert id="insert">
+        INSERT INTO fk_subsidy_calendar (id, subsidy_id, travel_date, travel_date_week,
+          subsidized_cities, subsidized_city_number, city_type,
+          standard_meal_expenses_amount, standard_traffic_amount, standard_communication_amount,
+          meal_expenses_amount, traffic_amount, communication_amount,
+          meal_selected, traffic_selected, communication_selected)
+        VALUES (#{id}, #{subsidyId}, #{travelDate}, #{travelDateWeek},
+          #{subsidizedCities}, #{subsidizedCityNumber}, #{cityType},
+          #{standardMealExpensesAmount}, #{standardTrafficAmount}, #{standardCommunicationAmount},
+          #{mealExpensesAmount}, #{trafficAmount}, #{communicationAmount},
+          #{mealSelected}, #{trafficSelected}, #{communicationSelected})
     </insert>
 
+    <select id="selectBySubsidyId" resultType="org.example.reimcloud.entity.SubsidyCalendar">
+        SELECT * FROM fk_subsidy_calendar WHERE subsidy_id = #{subsidyId} ORDER BY travel_date
+    </select>
+
+    <update id="update">
+        UPDATE fk_subsidy_calendar SET
+            meal_selected = #{mealSelected}, meal_expenses_amount = #{mealExpensesAmount},
+            traffic_selected = #{trafficSelected}, traffic_amount = #{trafficAmount},
+            communication_selected = #{communicationSelected}, communication_amount = #{communicationAmount}
+        WHERE id = #{id}
+    </update>
+
     <delete id="deleteByMainId">
-        delete from fk_subsidy_calendar
-        where subsidy_id in (select id from fk_reim_subsidy where main_id = #{mainId})
+        DELETE FROM fk_subsidy_calendar WHERE subsidy_id IN (
+            SELECT id FROM fk_reim_subsidy WHERE main_id = #{mainId}
+        )
     </delete>
 
-    <select id="selectBySubsidyId" resultMap="SubsidyCalendarMap">
-        select id, subsidy_id, travel_date, travel_date_week,
-               subsidized_cities, subsidized_city_number, city_type,
-               standard_meal_expenses_amount, standard_traffic_amount,
-               standard_communication_amount, meal_expenses_amount,
-               traffic_amount, communication_amount,
-               meal_selected, traffic_selected, communication_selected
-        from fk_subsidy_calendar
-        where subsidy_id = #{subsidyId}
-        order by travel_date
-    </select>
 </mapper>

@@ -1,0 +1,192 @@
+{
+  "info": {
+    "name": "差旅报销单系统 - 全接口测试",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080/api/v1"},
+    {"key": "sampleId", "value": "REIM20250522001"},
+    {"key": "tripId", "value": "TRIP001"},
+    {"key": "subsidyId", "value": "SUB001"},
+    {"key": "newId", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "1.1 列表",
+      "item": [
+        {"name":"TC01 默认分页","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"}]}}},
+        {"name":"TC02 按单号模糊","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?billNo=REIM","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"billNo","value":"REIM"}]}}},
+        {"name":"TC03 按状态筛选","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?billStatus=0","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"billStatus","value":"0"}]}}}
+      ]
+    },
+    {
+      "name": "1.2 新增报销单",
+      "item": [
+        {
+          "name": "TC04 新增草稿(含行程)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reimbursementTitle\": \"测试出差报销\",\n  \"businessTripReason\": \"参加技术交流会\",\n  \"reimburserId\": \"13AB3A3F72409002\",\n  \"reimburserNo\": \"74541\",\n  \"reimburserName\": \"徐年年\",\n  \"reimDepartmentId\": \"13AB8D7B52A9B002\",\n  \"reimDepartmentNo\": \"072001\",\n  \"reimDepartmentName\": \"客户成功事业部\",\n  \"reimCompanyId\": \"1C61686865DA8000\",\n  \"reimCompanyNo\": \"0409\",\n  \"reimCompanyName\": \"胜意科技武汉分公司\",\n  \"businessTypeId\": \"1B5FEB7DD4396000\",\n  \"businessTypeNo\": \"10010010101\",\n  \"businessTypeName\": \"项目出差\",\n  \"tripList\": [\n    {\n      \"travelerId\": \"13AB3A3F72409002\",\n      \"travelerNo\": \"74541\",\n      \"travelerName\": \"徐年年\",\n      \"departureCityNo\": \"10458\",\n      \"departureCityName\": \"武汉\",\n      \"arrivalCityNo\": \"10621\",\n      \"arrivalCityName\": \"上海\",\n      \"departureDate\": \"2025-05-21\",\n      \"arrivalDate\": \"2025-05-23\",\n      \"tripDescription\": \"技术交流会出差上海\"\n    }\n  ],\n  \"remarks\": \"测试备注\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/travel-reimbursements", "host": ["{{baseUrl}}"], "path": ["travel-reimbursements"]}
+          },
+          "description": "预期: code=0, 返回 id/billNo/billStatus=0。将返回的 id 手动设置到 newId 变量用于后续测试。"
+        }
+      ]
+    },
+    {
+      "name": "1.3 详情",
+      "item": [
+        {"name":"TC05 查示例详情","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements/{{sampleId}}","host":["{{baseUrl}}"],"path":["travel-reimbursements","{{sampleId}}"]}},"description":"预期: 含 tripList/subsidyList/allocationList"},
+        {"name":"TC06 查不存在","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements/NOTEXIST","host":["{{baseUrl}}"],"path":["travel-reimbursements","NOTEXIST"]}},"description":"预期: code=404"}
+      ]
+    },
+    {
+      "name": "1.4 修改",
+      "item": [
+        {
+          "name": "TC07 修改草稿",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reimbursementTitle\": \"武汉出差报销(已修改)\",\n  \"businessTripReason\": \"华中客户定制化项目上线支持\",\n  \"reimburserId\": \"13AB3A3F72409002\",\n  \"reimburserNo\": \"74541\",\n  \"reimburserName\": \"徐年年\",\n  \"reimDepartmentId\": \"13AB8D7B52A9B002\",\n  \"reimDepartmentNo\": \"072001\",\n  \"reimDepartmentName\": \"客户成功事业部\",\n  \"reimCompanyId\": \"1C61686865DA8000\",\n  \"reimCompanyNo\": \"0409\",\n  \"reimCompanyName\": \"胜意科技武汉分公司\",\n  \"businessTypeId\": \"1B5FEB7DD4396000\",\n  \"businessTypeNo\": \"10010010101\",\n  \"businessTypeName\": \"项目出差\",\n  \"tripList\": [\n    {\n      \"travelerId\": \"13AB3A3F72409002\",\n      \"travelerNo\": \"74541\",\n      \"travelerName\": \"徐年年\",\n      \"departureCityNo\": \"10458\",\n      \"departureCityName\": \"武汉\",\n      \"arrivalCityNo\": \"10119\",\n      \"arrivalCityName\": \"北京\",\n      \"departureDate\": \"2025-05-20\",\n      \"arrivalDate\": \"2025-05-22\",\n      \"tripDescription\": \"项目上线支持出差(修改)\"\n    }\n  ],\n  \"remarks\": \"已修改\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}", "host": ["{{baseUrl}}"], "path": ["travel-reimbursements", "{{sampleId}}"]}
+          },
+          "description": "预期: code=0, billStatus=0, 含updateTime"
+        }
+      ]
+    },
+    {
+      "name": "1.5 提交",
+      "item": [
+        {"name":"TC08 提交报销单","request":{"method":"POST","url":{"raw":"{{baseUrl}}/travel-reimbursements/{{sampleId}}/submission","host":["{{baseUrl}}"],"path":["travel-reimbursements","{{sampleId}}","submission"]}},"description":"预期: code=0, billStatus=1(已完成), 含submitTime"},
+        {"name":"TC09 重复提交(应报错)","request":{"method":"POST","url":{"raw":"{{baseUrl}}/travel-reimbursements/{{sampleId}}/submission","host":["{{baseUrl}}"],"path":["travel-reimbursements","{{sampleId}}","submission"]}},"description":"预期: code=400, 只有草稿状态允许提交"}
+      ]
+    },
+    {
+      "name": "1.6 作废",
+      "item": [
+        {"name":"TC10 作废草稿(新建一条后测试)","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/travel-reimbursements/{{sampleId}}","host":["{{baseUrl}}"],"path":["travel-reimbursements","{{sampleId}}"]}},"description":"预期: code=0, billStatus=2"}
+      ]
+    },
+    {
+      "name": "2.1 新增行程",
+      "item": [
+        {
+          "name": "TC11 新增行程",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"travelerId\": \"13AB498CC6409002\",\n  \"travelerNo\": \"74008\",\n  \"travelerName\": \"郑雨雪\",\n  \"departureCityNo\": \"10458\",\n  \"departureCityName\": \"武汉\",\n  \"arrivalCityNo\": \"10216\",\n  \"arrivalCityName\": \"杭州\",\n  \"departureDate\": \"2025-05-21\",\n  \"arrivalDate\": \"2025-05-22\",\n  \"tripDescription\": \"杭州客户拜访\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}/trips", "host": ["{{baseUrl}}"], "path": ["travel-reimbursements", "{{sampleId}}", "trips"]}
+          },
+          "description": "预期: code=0, 返回 tripId/subsidyId"
+        }
+      ]
+    },
+    {
+      "name": "2.2 修改行程",
+      "item": [
+        {
+          "name": "TC12 修改行程",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"travelerId\": \"13AB498CC6409002\",\n  \"travelerNo\": \"74008\",\n  \"travelerName\": \"郑雨雪\",\n  \"departureCityNo\": \"10458\",\n  \"departureCityName\": \"武汉\",\n  \"arrivalCityNo\": \"10216\",\n  \"arrivalCityName\": \"杭州\",\n  \"departureDate\": \"2025-05-21\",\n  \"arrivalDate\": \"2025-05-23\",\n  \"tripDescription\": \"杭州客户拜访(延长一天)\"\n}"
+            },
+            "url": {"raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}/trips/{{tripId}}", "host": ["{{baseUrl}}"], "path": ["travel-reimbursements", "{{sampleId}}", "trips", "{{tripId}}"]}
+          },
+          "description": "预期: code=0, 行程已更新"
+        }
+      ]
+    },
+    {
+      "name": "2.3 删除行程",
+      "item": [
+        {"name":"TC13 删除行程","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/travel-reimbursements/{{sampleId}}/trips/TRIP002","host":["{{baseUrl}}"],"path":["travel-reimbursements","{{sampleId}}","trips","TRIP002"]}},"description":"预期: code=0"}
+      ]
+    },
+    {
+      "name": "3.1 查询补助日历",
+      "item": [
+        {"name":"TC14 查补助日历","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements/{{sampleId}}/subsidies/{{subsidyId}}/calendar","host":["{{baseUrl}}"],"path":["travel-reimbursements","{{sampleId}}","subsidies","{{subsidyId}}","calendar"]}},"description":"预期: code=0, 含 calendarList 3条记录"}
+      ]
+    },
+    {
+      "name": "3.2 保存补助日历",
+      "item": [
+        {
+          "name": "TC15 修改补助(取消第一天的餐费)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\"calendarId\": \"CAL001\", \"mealSelected\": false, \"mealAmount\": 0,\n   \"transportSelected\": true, \"transportAmount\": 40.00,\n   \"phoneSelected\": true, \"phoneAmount\": 40.00},\n  {\"calendarId\": \"CAL002\", \"mealSelected\": true, \"mealAmount\": 100.00,\n   \"transportSelected\": true, \"transportAmount\": 40.00,\n   \"phoneSelected\": true, \"phoneAmount\": 40.00},\n  {\"calendarId\": \"CAL003\", \"mealSelected\": true, \"mealAmount\": 100.00,\n   \"transportSelected\": true, \"transportAmount\": 40.00,\n   \"phoneSelected\": true, \"phoneAmount\": 40.00}\n]"
+            },
+            "url": {"raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}/subsidies/{{subsidyId}}/calendar", "host": ["{{baseUrl}}"], "path": ["travel-reimbursements", "{{sampleId}}", "subsidies", "{{subsidyId}}", "calendar"]}
+          },
+          "description": "预期: code=0, 金额已更新"
+        }
+      ]
+    },
+    {
+      "name": "4.1 保存分摊",
+      "item": [
+        {
+          "name": "TC16 保存分摊",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"reimCompanyId\": \"1C61686865DA8000\",\n    \"reimCompanyNo\": \"0409\",\n    \"reimCompanyName\": \"胜意科技武汉分公司\",\n    \"projectId\": \"1C811ABF96195000\",\n    \"projectNo\": \"centralChina\",\n    \"projectName\": \"华中客户定制化项目\",\n    \"allocationRatio\": 1.0000,\n    \"allocationAmount\": 540.00\n  }\n]"
+            },
+            "url": {"raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}/allocations", "host": ["{{baseUrl}}"], "path": ["travel-reimbursements", "{{sampleId}}", "allocations"]}
+          },
+          "description": "预期: code=0, 返回分摊列表。注意: allocationAmount须等于当前补助总金额。"
+        }
+      ]
+    },
+    {
+      "name": "4.2 均摊试算",
+      "item": [
+        {
+          "name": "TC17 均摊试算(2行)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"reimCompanyId\": \"1C61686865DA8000\",\n    \"reimCompanyNo\": \"0409\",\n    \"reimCompanyName\": \"胜意科技武汉分公司\",\n    \"projectId\": \"1C811ABF96195000\",\n    \"projectNo\": \"centralChina\",\n    \"projectName\": \"华中项目\"\n  },\n  {\n    \"reimCompanyId\": \"19218A262C976000\",\n    \"reimCompanyNo\": \"0408\",\n    \"reimCompanyName\": \"胜意科技上海分公司\",\n    \"projectId\": \"1C5931735AC4A000\",\n    \"projectNo\": \"southChina\",\n    \"projectName\": \"华南项目\"\n  }\n]"
+            },
+            "url": {"raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}/allocation-equalizations", "host": ["{{baseUrl}}"], "path": ["travel-reimbursements", "{{sampleId}}", "allocation-equalizations"]}
+          },
+          "description": "预期: code=0, 返回2行均摊结果, 首行含除不尽差值"
+        }
+      ]
+    },
+    {
+      "name": "5.x 基础数据(已有)",
+      "item": [
+        {"name":"TC18 公司列表","request":{"method":"GET","url":{"raw":"{{baseUrl}}/reim-companies","host":["{{baseUrl}}"],"path":["reim-companies"]}}},
+        {"name":"TC19 部门列表","request":{"method":"GET","url":{"raw":"{{baseUrl}}/reim-departments","host":["{{baseUrl}}"],"path":["reim-departments"]}}},
+        {"name":"TC20 员工列表","request":{"method":"GET","url":{"raw":"{{baseUrl}}/employees","host":["{{baseUrl}}"],"path":["employees"]}}},
+        {"name":"TC21 业务类型树","request":{"method":"GET","url":{"raw":"{{baseUrl}}/business-types/tree","host":["{{baseUrl}}"],"path":["business-types","tree"]}}},
+        {"name":"TC22 城市列表","request":{"method":"GET","url":{"raw":"{{baseUrl}}/cities","host":["{{baseUrl}}"],"path":["cities"]}}},
+        {"name":"TC23 项目列表","request":{"method":"GET","url":{"raw":"{{baseUrl}}/projects","host":["{{baseUrl}}"],"path":["projects"]}}}
+      ]
+    }
+  ]
+}

@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubmitResult {
-
     private String id;
     private String billNo;
     private String billStatus;

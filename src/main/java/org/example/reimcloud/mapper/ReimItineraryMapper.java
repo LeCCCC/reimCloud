@@ -11,7 +11,13 @@ public interface ReimItineraryMapper {
 
     int insert(ReimItinerary itinerary);
 
-    int deleteByMainId(@Param("mainId") String mainId);
-
     List<ReimItinerary> selectByMainId(@Param("mainId") String mainId);
+
+    ReimItinerary selectById(@Param("id") String id);
+
+    int update(ReimItinerary itinerary);
+
+    int deleteById(@Param("id") String id);
+
+    int deleteByMainId(@Param("mainId") String mainId);
 }

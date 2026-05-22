@@ -18,6 +18,7 @@ public class FkReimMain {
     private String billNo;
     private String billStatus;
     private LocalDateTime creationTime;
+    private LocalDateTime updateTime;
     private String reimbursementTitle;
     private String reimburserId;
     private String reimburserNo;
