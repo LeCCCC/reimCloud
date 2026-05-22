@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.reimcloud.mapper.ReimItineraryMapper">
+
+    <resultMap id="ReimItineraryMap" type="org.example.reimcloud.entity.ReimItinerary">
+        <id column="id" property="id"/>
+        <result column="main_id" property="mainId"/>
+        <result column="subsidy_id" property="subsidyId"/>
+        <result column="traveler_id" property="travelerId"/>
+        <result column="traveler_no" property="travelerNo"/>
+        <result column="traveler_name" property="travelerName"/>
+        <result column="departure_date" property="departureDate"/>
+        <result column="arrival_date" property="arrivalDate"/>
+        <result column="departure_city" property="departureCity"/>
+        <result column="departure_city_no" property="departureCityNo"/>
+        <result column="arriving_city" property="arrivingCity"/>
+        <result column="arriving_city_no" property="arrivingCityNo"/>
+        <result column="itinerary_instructions" property="itineraryInstructions"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="org.example.reimcloud.entity.ReimItinerary">
+        insert into fk_reim_itinerary (
+            id, main_id, subsidy_id, traveler_id, traveler_no, traveler_name,
+            departure_date, arrival_date, departure_city, departure_city_no,
+            arriving_city, arriving_city_no, itinerary_instructions
+        ) values (
+            #{id}, #{mainId}, #{subsidyId}, #{travelerId}, #{travelerNo}, #{travelerName},
+            #{departureDate}, #{arrivalDate}, #{departureCity}, #{departureCityNo},
+            #{arrivingCity}, #{arrivingCityNo}, #{itineraryInstructions}
+        )
+    </insert>
+
+    <delete id="deleteByMainId">
+        delete from fk_reim_itinerary
+        where main_id = #{mainId}
+    </delete>
+
+    <select id="selectByMainId" resultMap="ReimItineraryMap">
+        select id, main_id, subsidy_id, traveler_id, traveler_no, traveler_name,
+               departure_date, arrival_date, departure_city, departure_city_no,
+               arriving_city, arriving_city_no, itinerary_instructions
+        from fk_reim_itinerary
+        where main_id = #{mainId}
+        order by traveler_name, departure_date, arrival_date
+    </select>
+</mapper>

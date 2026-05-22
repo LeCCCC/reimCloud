@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.reimcloud.mapper.ReimMainMapper">
+
+    <resultMap id="ReimMainMap" type="org.example.reimcloud.entity.ReimMain">
+        <id column="id" property="id"/>
+        <result column="bill_no" property="billNo"/>
+        <result column="bill_status" property="billStatus"/>
+        <result column="creation_time" property="creationTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="reimbursement_title" property="reimbursementTitle"/>
+        <result column="reimburser_id" property="reimburserId"/>
+        <result column="reimburser_no" property="reimburserNo"/>
+        <result column="reimburser_name" property="reimburserName"/>
+        <result column="reim_department_id" property="reimDepartmentId"/>
+        <result column="reim_department_no" property="reimDepartmentNo"/>
+        <result column="reim_department_name" property="reimDepartmentName"/>
+        <result column="reim_company_id" property="reimCompanyId"/>
+        <result column="reim_company_no" property="reimCompanyNo"/>
+        <result column="reim_company_name" property="reimCompanyName"/>
+        <result column="business_type_id" property="businessTypeId"/>
+        <result column="business_type_no" property="businessTypeNo"/>
+        <result column="business_type_name" property="businessTypeName"/>
+        <result column="business_trip_reason" property="businessTripReason"/>
+        <result column="subsidy_total" property="subsidyTotal"/>
+        <result column="meal_allowance" property="mealAllowance"/>
+        <result column="transportation_allowance" property="transportationAllowance"/>
+        <result column="phone_allowance" property="phoneAllowance"/>
+        <result column="remarks" property="remarks"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="org.example.reimcloud.entity.ReimMain">
+        insert into fk_reim_main (
+            id, bill_no, bill_status, creation_time, update_time,
+            reimbursement_title, reimburser_id, reimburser_no, reimburser_name,
+            reim_department_id, reim_department_no, reim_department_name,
+            reim_company_id, reim_company_no, reim_company_name,
+            business_type_id, business_type_no, business_type_name,
+            business_trip_reason, subsidy_total, meal_allowance,
+            transportation_allowance, phone_allowance, remarks
+        ) values (
+            #{id}, #{billNo}, #{billStatus}, #{creationTime}, #{updateTime},
+            #{reimbursementTitle}, #{reimburserId}, #{reimburserNo}, #{reimburserName},
+            #{reimDepartmentId}, #{reimDepartmentNo}, #{reimDepartmentName},
+            #{reimCompanyId}, #{reimCompanyNo}, #{reimCompanyName},
+            #{businessTypeId}, #{businessTypeNo}, #{businessTypeName},
+            #{businessTripReason}, #{subsidyTotal}, #{mealAllowance},
+            #{transportationAllowance}, #{phoneAllowance}, #{remarks}
+        )
+    </insert>
+
+    <update id="updateDraft" parameterType="org.example.reimcloud.entity.ReimMain">
+        update fk_reim_main set
+            update_time = #{updateTime},
+            reimbursement_title = #{reimbursementTitle},
+            reimburser_id = #{reimburserId},
+            reimburser_no = #{reimburserNo},
+            reimburser_name = #{reimburserName},
+            reim_department_id = #{reimDepartmentId},
+            reim_department_no = #{reimDepartmentNo},
+            reim_department_name = #{reimDepartmentName},
+            reim_company_id = #{reimCompanyId},
+            reim_company_no = #{reimCompanyNo},
+            reim_company_name = #{reimCompanyName},
+            business_type_id = #{businessTypeId},
+            business_type_no = #{businessTypeNo},
+            business_type_name = #{businessTypeName},
+            business_trip_reason = #{businessTripReason},
+            subsidy_total = #{subsidyTotal},
+            meal_allowance = #{mealAllowance},
+            transportation_allowance = #{transportationAllowance},
+            phone_allowance = #{phoneAllowance},
+            remarks = #{remarks}
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus" parameterType="org.example.reimcloud.entity.ReimMain">
+        update fk_reim_main
+        set bill_status = #{billStatus}, update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="ReimMainMap">
+        select
+            id, bill_no, bill_status, creation_time, update_time,
+            reimbursement_title, reimburser_id, reimburser_no, reimburser_name,
+            reim_department_id, reim_department_no, reim_department_name,
+            reim_company_id, reim_company_no, reim_company_name,
+            business_type_id, business_type_no, business_type_name,
+            business_trip_reason, subsidy_total, meal_allowance,
+            transportation_allowance, phone_allowance, remarks
+        from fk_reim_main
+        where id = #{id}
+    </select>
+
+    <select id="countToday" resultType="int">
+        select count(1)
+        from fk_reim_main
+        where date(creation_time) = current_date
+    </select>
+</mapper>
