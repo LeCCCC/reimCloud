@@ -1,0 +1,564 @@
+{
+  "info": {
+    "name": "reimCloud 报销单据页面 - 接口测试",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1"
+    },
+    {
+      "key": "reimbursementId",
+      "value": ""
+    },
+    {
+      "key": "subsidyId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0. 基础数据接口",
+      "item": [
+        {
+          "name": "TC-01 查询费用归属公司",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reim-companies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reim-companies"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('code=0', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('0');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-02 查询报销部门",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reim-departments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reim-departments"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('code=0', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('0');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-03 查询员工",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/employees?keyword=徐",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employees"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "徐"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('code=0', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('0');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-04 查询业务类型树",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/business-types/tree",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "business-types",
+                "tree"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('code=0', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('0');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-05 查询城市",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/cities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cities"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('code=0', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('0');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-06 查询项目",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('code=0', function () {",
+                  "  pm.expect(pm.response.json().code).to.eql('0');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. 报销单据页面主流程",
+      "item": [
+        {
+          "name": "TC-07 新增报销单草稿",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reimbursementTitle\": \"北京出差报销\",\n  \"businessTripReason\": \"项目现场支持\",\n  \"reimburserId\": \"13AB3A3F72409002\",\n  \"reimburserNo\": \"74541\",\n  \"reimburserName\": \"徐年年\",\n  \"reimDepartmentId\": \"13AB8D7B52A9B002\",\n  \"reimDepartmentNo\": \"072001\",\n  \"reimDepartmentName\": \"客户成功事业部\",\n  \"reimCompanyId\": \"1C54557F1782E000\",\n  \"reimCompanyNo\": \"0407\",\n  \"reimCompanyName\": \"胜意科技北京分公司\",\n  \"businessTypeId\": \"1B5FEB7DD4396000\",\n  \"businessTypeNo\": \"10010010101\",\n  \"businessTypeName\": \"项目出差\",\n  \"tripList\": [\n    {\n      \"travelerId\": \"13AB3A3F72409002\",\n      \"travelerNo\": \"74541\",\n      \"travelerName\": \"徐年年\",\n      \"departureCityNo\": \"10458\",\n      \"departureCityName\": \"武汉\",\n      \"arrivalCityNo\": \"10119\",\n      \"arrivalCityName\": \"北京\",\n      \"departureDate\": \"2026-05-20\",\n      \"arrivalDate\": \"2026-05-21\",\n      \"tripDescription\": \"武汉到北京项目支持\"\n    }\n  ],\n  \"remarks\": \"Postman 新增草稿测试\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('新增成功', function () {",
+                  "  pm.expect(json.code).to.eql('0');",
+                  "  pm.expect(json.data.id).to.be.a('string').and.not.empty;",
+                  "  pm.expect(json.data.billStatus).to.eql('0');",
+                  "});",
+                  "pm.collectionVariables.set('reimbursementId', json.data.id);"
+                ]
+              }
+            }
+          ],
+          "description": "预期：code=0，返回 id、billNo、billStatus=0，并自动写入 collection 变量 reimbursementId。"
+        },
+        {
+          "name": "TC-08 查询新增后的报销单详情",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/{{reimbursementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements",
+                "{{reimbursementId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('详情查询成功', function () {",
+                  "  pm.expect(json.code).to.eql('0');",
+                  "  pm.expect(json.data.id).to.eql(pm.collectionVariables.get('reimbursementId'));",
+                  "  pm.expect(json.data.tripList.length).to.be.above(0);",
+                  "  pm.expect(json.data.subsidyList.length).to.be.above(0);",
+                  "  pm.expect(json.data.costSummary.subsidyTotal).to.be.above(0);",
+                  "});",
+                  "pm.collectionVariables.set('subsidyId', json.data.subsidyList[0].subsidyId);"
+                ]
+              }
+            }
+          ],
+          "description": "预期：回显基础信息、补录行程、补助信息、费用合计，并自动保存 subsidyId。"
+        },
+        {
+          "name": "TC-09 查询补助日历",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/{{reimbursementId}}/subsidies/{{subsidyId}}/calendar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements",
+                "{{reimbursementId}}",
+                "subsidies",
+                "{{subsidyId}}",
+                "calendar"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('补助日历查询成功', function () {",
+                  "  pm.expect(json.code).to.eql('0');",
+                  "  pm.expect(json.data.subsidyId).to.eql(pm.collectionVariables.get('subsidyId'));",
+                  "  pm.expect(json.data.calendarList.length).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "预期：返回补助日历明细，包含餐补、交通补、通讯补标准和金额。"
+        },
+        {
+          "name": "TC-10 修改草稿报销单",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reimbursementTitle\": \"北京出差报销-修改后\",\n  \"businessTripReason\": \"项目现场支持和客户沟通\",\n  \"reimburserId\": \"13AB3A3F72409002\",\n  \"reimburserNo\": \"74541\",\n  \"reimburserName\": \"徐年年\",\n  \"reimDepartmentId\": \"13AB8D7B52A9B002\",\n  \"reimDepartmentNo\": \"072001\",\n  \"reimDepartmentName\": \"客户成功事业部\",\n  \"reimCompanyId\": \"1C54557F1782E000\",\n  \"reimCompanyNo\": \"0407\",\n  \"reimCompanyName\": \"胜意科技北京分公司\",\n  \"businessTypeId\": \"1B5FEB7DD4396000\",\n  \"businessTypeNo\": \"10010010101\",\n  \"businessTypeName\": \"项目出差\",\n  \"tripList\": [\n    {\n      \"travelerId\": \"13AB3A3F72409002\",\n      \"travelerNo\": \"74541\",\n      \"travelerName\": \"徐年年\",\n      \"departureCityNo\": \"10458\",\n      \"departureCityName\": \"武汉\",\n      \"arrivalCityNo\": \"10119\",\n      \"arrivalCityName\": \"北京\",\n      \"departureDate\": \"2026-05-19\",\n      \"arrivalDate\": \"2026-05-21\",\n      \"tripDescription\": \"武汉到北京项目支持和客户沟通\"\n    }\n  ],\n  \"remarks\": \"Postman 修改草稿测试\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/{{reimbursementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements",
+                "{{reimbursementId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('修改成功', function () {",
+                  "  pm.expect(json.code).to.eql('0');",
+                  "  pm.expect(json.data.billStatus).to.eql('0');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "预期：草稿修改成功。当前实现是整单保存，会重建行程、补助和日历。"
+        },
+        {
+          "name": "TC-11 提交报销单",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/{{reimbursementId}}/submission",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements",
+                "{{reimbursementId}}",
+                "submission"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('提交成功', function () {",
+                  "  pm.expect(json.code).to.eql('0');",
+                  "  pm.expect(json.data.billStatus).to.eql('1');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "预期：提交成功，billStatus=1。"
+        },
+        {
+          "name": "TC-12 提交后再次修改应失败",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reimbursementTitle\": \"提交后修改测试\",\n  \"businessTripReason\": \"提交后不允许修改\",\n  \"reimburserId\": \"13AB3A3F72409002\",\n  \"reimburserNo\": \"74541\",\n  \"reimburserName\": \"徐年年\",\n  \"reimDepartmentId\": \"13AB8D7B52A9B002\",\n  \"reimDepartmentNo\": \"072001\",\n  \"reimDepartmentName\": \"客户成功事业部\",\n  \"reimCompanyId\": \"1C54557F1782E000\",\n  \"reimCompanyNo\": \"0407\",\n  \"reimCompanyName\": \"胜意科技北京分公司\",\n  \"businessTypeId\": \"1B5FEB7DD4396000\",\n  \"businessTypeNo\": \"10010010101\",\n  \"businessTypeName\": \"项目出差\",\n  \"tripList\": [],\n  \"remarks\": \"提交后修改测试\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/{{reimbursementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements",
+                "{{reimbursementId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('提交后修改失败', function () {",
+                  "  pm.expect(json.code).to.not.eql('0');",
+                  "  pm.expect(json.message).to.include('草稿');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "预期：返回业务错误，只有草稿状态允许修改。"
+        }
+      ]
+    },
+    {
+      "name": "2. 后台校验场景",
+      "item": [
+        {
+          "name": "TC-13 标题为空应失败",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reimbursementTitle\": \"\",\n  \"businessTripReason\": \"项目现场支持\",\n  \"reimburserId\": \"13AB3A3F72409002\",\n  \"reimburserNo\": \"74541\",\n  \"reimburserName\": \"徐年年\",\n  \"reimDepartmentId\": \"13AB8D7B52A9B002\",\n  \"reimDepartmentNo\": \"072001\",\n  \"reimDepartmentName\": \"客户成功事业部\",\n  \"reimCompanyId\": \"1C54557F1782E000\",\n  \"reimCompanyNo\": \"0407\",\n  \"reimCompanyName\": \"胜意科技北京分公司\",\n  \"businessTypeId\": \"1B5FEB7DD4396000\",\n  \"businessTypeNo\": \"10010010101\",\n  \"businessTypeName\": \"项目出差\",\n  \"tripList\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('标题为空失败', function () {",
+                  "  pm.expect(json.code).to.not.eql('0');",
+                  "  pm.expect(json.message).to.include('报销标题');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-14 到达日期早于出发日期应失败",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reimbursementTitle\": \"日期校验测试\",\n  \"businessTripReason\": \"测试到达日期早于出发日期\",\n  \"reimburserId\": \"13AB3A3F72409002\",\n  \"reimburserNo\": \"74541\",\n  \"reimburserName\": \"徐年年\",\n  \"reimDepartmentId\": \"13AB8D7B52A9B002\",\n  \"reimDepartmentNo\": \"072001\",\n  \"reimDepartmentName\": \"客户成功事业部\",\n  \"reimCompanyId\": \"1C54557F1782E000\",\n  \"reimCompanyNo\": \"0407\",\n  \"reimCompanyName\": \"胜意科技北京分公司\",\n  \"businessTypeId\": \"1B5FEB7DD4396000\",\n  \"businessTypeNo\": \"10010010101\",\n  \"businessTypeName\": \"项目出差\",\n  \"tripList\": [\n    {\n      \"travelerId\": \"13AB3A3F72409002\",\n      \"travelerNo\": \"74541\",\n      \"travelerName\": \"徐年年\",\n      \"departureCityNo\": \"10458\",\n      \"departureCityName\": \"武汉\",\n      \"arrivalCityNo\": \"10119\",\n      \"arrivalCityName\": \"北京\",\n      \"departureDate\": \"2026-05-21\",\n      \"arrivalDate\": \"2026-05-20\",\n      \"tripDescription\": \"日期校验测试\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('日期倒挂失败', function () {",
+                  "  pm.expect(json.code).to.not.eql('0');",
+                  "  pm.expect(json.message).to.include('到达日期');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-15 同一人员行程重叠应失败",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reimbursementTitle\": \"行程重叠测试\",\n  \"businessTripReason\": \"测试同一人员日期重叠\",\n  \"reimburserId\": \"13AB3A3F72409002\",\n  \"reimburserNo\": \"74541\",\n  \"reimburserName\": \"徐年年\",\n  \"reimDepartmentId\": \"13AB8D7B52A9B002\",\n  \"reimDepartmentNo\": \"072001\",\n  \"reimDepartmentName\": \"客户成功事业部\",\n  \"reimCompanyId\": \"1C54557F1782E000\",\n  \"reimCompanyNo\": \"0407\",\n  \"reimCompanyName\": \"胜意科技北京分公司\",\n  \"businessTypeId\": \"1B5FEB7DD4396000\",\n  \"businessTypeNo\": \"10010010101\",\n  \"businessTypeName\": \"项目出差\",\n  \"tripList\": [\n    {\n      \"travelerId\": \"13AB3A3F72409002\",\n      \"travelerNo\": \"74541\",\n      \"travelerName\": \"徐年年\",\n      \"departureCityNo\": \"10458\",\n      \"departureCityName\": \"武汉\",\n      \"arrivalCityNo\": \"10119\",\n      \"arrivalCityName\": \"北京\",\n      \"departureDate\": \"2026-05-18\",\n      \"arrivalDate\": \"2026-05-20\",\n      \"tripDescription\": \"第一段行程\"\n    },\n    {\n      \"travelerId\": \"13AB3A3F72409002\",\n      \"travelerNo\": \"74541\",\n      \"travelerName\": \"徐年年\",\n      \"departureCityNo\": \"10119\",\n      \"departureCityName\": \"北京\",\n      \"arrivalCityNo\": \"10621\",\n      \"arrivalCityName\": \"上海\",\n      \"departureDate\": \"2026-05-20\",\n      \"arrivalDate\": \"2026-05-21\",\n      \"tripDescription\": \"第二段重叠行程\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "travel-reimbursements"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('行程重叠失败', function () {",
+                  "  pm.expect(json.code).to.not.eql('0');",
+                  "  pm.expect(json.message).to.include('日期');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

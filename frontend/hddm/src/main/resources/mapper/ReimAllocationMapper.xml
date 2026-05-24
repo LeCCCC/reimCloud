@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.reimcloud.mapper.ReimAllocationMapper">
+
+    <insert id="insert">
+        INSERT INTO fk_reim_allocation (id, main_id, reim_company_id, reim_company_no, reim_company_name,
+          project_id, project_no, project_name, allocation_ratio, allocation_amount)
+        VALUES (#{id}, #{mainId}, #{reimCompanyId}, #{reimCompanyNo}, #{reimCompanyName},
+          #{projectId}, #{projectNo}, #{projectName}, #{allocationRatio}, #{allocationAmount})
+    </insert>
+
+    <select id="selectByMainId" resultType="org.example.reimcloud.entity.ReimAllocation">
+        SELECT * FROM fk_reim_allocation WHERE main_id = #{mainId} ORDER BY id
+    </select>
+
+    <delete id="deleteByMainId">
+        DELETE FROM fk_reim_allocation WHERE main_id = #{mainId}
+    </delete>
+
+</mapper>

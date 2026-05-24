@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.reimcloud.mapper.SubsidyCalendarMapper">
+
+    <insert id="insert">
+        INSERT INTO fk_subsidy_calendar (id, subsidy_id, travel_date, travel_date_week,
+          subsidized_cities, subsidized_city_number, city_type,
+          standard_meal_expenses_amount, standard_traffic_amount, standard_communication_amount,
+          meal_expenses_amount, traffic_amount, communication_amount,
+          meal_selected, traffic_selected, communication_selected)
+        VALUES (#{id}, #{subsidyId}, #{travelDate}, #{travelDateWeek},
+          #{subsidizedCities}, #{subsidizedCityNumber}, #{cityType},
+          #{standardMealExpensesAmount}, #{standardTrafficAmount}, #{standardCommunicationAmount},
+          #{mealExpensesAmount}, #{trafficAmount}, #{communicationAmount},
+          #{mealSelected}, #{trafficSelected}, #{communicationSelected})
+    </insert>
+
+    <select id="selectBySubsidyId" resultType="org.example.reimcloud.entity.SubsidyCalendar">
+        SELECT * FROM fk_subsidy_calendar WHERE subsidy_id = #{subsidyId} ORDER BY travel_date
+    </select>
+
+    <update id="update">
+        UPDATE fk_subsidy_calendar SET
+            meal_selected = #{mealSelected}, meal_expenses_amount = #{mealExpensesAmount},
+            traffic_selected = #{trafficSelected}, traffic_amount = #{trafficAmount},
+            communication_selected = #{communicationSelected}, communication_amount = #{communicationAmount}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByMainId">
+        DELETE FROM fk_subsidy_calendar WHERE subsidy_id IN (
+            SELECT id FROM fk_reim_subsidy WHERE main_id = #{mainId}
+        )
+    </delete>
+
+</mapper>

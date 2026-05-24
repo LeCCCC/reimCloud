@@ -1,0 +1,127 @@
+{
+  "info": {
+    "name": "差旅报销单系统 - 接口测试",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080/api/v1"},
+    {"key": "sampleId", "value": "REIM20250522001"}
+  ],
+  "item": [
+    {
+      "name": "1.1 报销单分页列表",
+      "item": [
+        {"name":"TC-01 默认分页","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"}]}}},
+        {"name":"TC-02 按单号模糊查询","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&billNo=REIM","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"billNo","value":"REIM"}]}}},
+        {"name":"TC-03 按标题模糊查询","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&reimbursementTitle=武汉","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"reimbursementTitle","value":"武汉"}]}}},
+        {"name":"TC-04 按事由模糊查询","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&businessTripReason=项目","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"businessTripReason","value":"项目"}]}}},
+        {"name":"TC-05 按公司筛选","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&reimCompanyId=1C61686865DA8000","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"reimCompanyId","value":"1C61686865DA8000"}]}}},
+        {"name":"TC-06 按部门筛选","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&reimDepartmentId=13AB8D7B52A9B002","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"reimDepartmentId","value":"13AB8D7B52A9B002"}]}}},
+        {"name":"TC-07 按报销人筛选","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&reimburserId=13AB3A3F72409002","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"reimburserId","value":"13AB3A3F72409002"}]}}},
+        {"name":"TC-08 按业务类型筛选","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&businessTypeId=1B5FEB7DD4396000","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"businessTypeId","value":"1B5FEB7DD4396000"}]}}},
+        {"name":"TC-09 按状态-草稿","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&billStatus=0","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"billStatus","value":"0"}]}}},
+        {"name":"TC-10 组合条件查询","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&billNo=REIM&billStatus=0&reimCompanyId=1C61686865DA8000","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"billNo","value":"REIM"},{"key":"billStatus","value":"0"},{"key":"reimCompanyId","value":"1C61686865DA8000"}]}}},
+        {"name":"TC-11 空结果","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=1&size=10&billNo=NOTEXIST","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"1"},{"key":"size","value":"10"},{"key":"billNo","value":"NOTEXIST"}]}}},
+        {"name":"TC-12 翻页空页","request":{"method":"GET","url":{"raw":"{{baseUrl}}/travel-reimbursements?current=2&size=10","host":["{{baseUrl}}"],"path":["travel-reimbursements"],"query":[{"key":"current","value":"2"},{"key":"size","value":"10"}]}}}
+      ]
+    },
+    {
+      "name": "1.3 查询报销单详情",
+      "item": [
+        {
+          "name": "TC-21 查询存在的报销单详情",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["travel-reimbursements", "{{sampleId}}"]
+            }
+          },
+          "description": "预期: code=0, data.id=REIM20250522001, data包含基础信息+费用合计, tripList/subsidyList/allocationList当前为空数组"
+        },
+        {
+          "name": "TC-22 查询不存在的报销单",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/NOTEXIST",
+              "host": ["{{baseUrl}}"],
+              "path": ["travel-reimbursements", "NOTEXIST"]
+            }
+          },
+          "description": "预期: code=404, message=报销单不存在, data=null"
+        }
+      ]
+    },
+    {
+      "name": "1.6 作废报销单",
+      "item": [
+        {
+          "name": "TC-23 正常作废（先执行 TC-21 确认 status=0）",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["travel-reimbursements", "{{sampleId}}"]
+            }
+          },
+          "description": "预期: code=0, data.id=REIM20250522001, data.billStatus=2。注意: 执行后该单据变为已作废，列表查询billStatus=0将不再返回此单据。"
+        },
+        {
+          "name": "TC-24 重复作废（紧接 TC-23 再执行一次）",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/{{sampleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["travel-reimbursements", "{{sampleId}}"]
+            }
+          },
+          "description": "预期: code=400, message=该报销单已作废，不可重复作废。验证幂等保护。"
+        },
+        {
+          "name": "TC-25 作废不存在的报销单",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/travel-reimbursements/NOTEXIST",
+              "host": ["{{baseUrl}}"],
+              "path": ["travel-reimbursements", "NOTEXIST"]
+            }
+          },
+          "description": "预期: code=404, message=报销单不存在"
+        }
+      ]
+    },
+    {
+      "name": "5.1 费用归属公司下拉",
+      "item": [
+        {"name":"TC-13 全部公司","request":{"method":"GET","url":{"raw":"{{baseUrl}}/reim-companies","host":["{{baseUrl}}"],"path":["reim-companies"]}}},
+        {"name":"TC-14 关键字搜索","request":{"method":"GET","url":{"raw":"{{baseUrl}}/reim-companies?keyword=武汉","host":["{{baseUrl}}"],"path":["reim-companies"],"query":[{"key":"keyword","value":"武汉"}]}}}
+      ]
+    },
+    {
+      "name": "5.2 报销部门下拉",
+      "item": [
+        {"name":"TC-15 全部部门","request":{"method":"GET","url":{"raw":"{{baseUrl}}/reim-departments","host":["{{baseUrl}}"],"path":["reim-departments"]}}},
+        {"name":"TC-16 关键字搜索","request":{"method":"GET","url":{"raw":"{{baseUrl}}/reim-departments?keyword=客户","host":["{{baseUrl}}"],"path":["reim-departments"],"query":[{"key":"keyword","value":"客户"}]}}}
+      ]
+    },
+    {
+      "name": "5.3 员工下拉",
+      "item": [
+        {"name":"TC-17 全部员工","request":{"method":"GET","url":{"raw":"{{baseUrl}}/employees","host":["{{baseUrl}}"],"path":["employees"]}}},
+        {"name":"TC-18 按姓名搜索","request":{"method":"GET","url":{"raw":"{{baseUrl}}/employees?keyword=徐","host":["{{baseUrl}}"],"path":["employees"],"query":[{"key":"keyword","value":"徐"}]}}},
+        {"name":"TC-19 按工号搜索","request":{"method":"GET","url":{"raw":"{{baseUrl}}/employees?keyword=74541","host":["{{baseUrl}}"],"path":["employees"],"query":[{"key":"keyword","value":"74541"}]}}}
+      ]
+    },
+    {
+      "name": "5.4 业务类型树",
+      "item": [
+        {"name":"TC-20 业务类型树","request":{"method":"GET","url":{"raw":"{{baseUrl}}/business-types/tree","host":["{{baseUrl}}"],"path":["business-types","tree"]}}}
+      ]
+    }
+  ]
+}

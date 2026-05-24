@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.reimcloud.mapper.ReimSubsidyMapper">
+
+    <insert id="insert">
+        INSERT INTO fk_reim_subsidy (id, main_id, traveler_id, traveler_no, traveler_name,
+          departure_date, arrival_date, subsidy_days, departure_city, departure_city_no,
+          arriving_city, arriving_city_no, application_amount, subsidy_amount,
+          meal_allowance, transportation_allowance, phone_allowance,
+          business_type_id, business_type_no, business_type_name)
+        VALUES (#{id}, #{mainId}, #{travelerId}, #{travelerNo}, #{travelerName},
+          #{departureDate}, #{arrivalDate}, #{subsidyDays}, #{departureCity}, #{departureCityNo},
+          #{arrivingCity}, #{arrivingCityNo}, #{applicationAmount}, #{subsidyAmount},
+          #{mealAllowance}, #{transportationAllowance}, #{phoneAllowance},
+          #{businessTypeId}, #{businessTypeNo}, #{businessTypeName})
+    </insert>
+
+    <select id="selectByMainId" resultType="org.example.reimcloud.entity.ReimSubsidy">
+        SELECT * FROM fk_reim_subsidy WHERE main_id = #{mainId} ORDER BY departure_date
+    </select>
+
+    <select id="selectById" resultType="org.example.reimcloud.entity.ReimSubsidy">
+        SELECT * FROM fk_reim_subsidy WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE fk_reim_subsidy SET
+            application_amount = #{applicationAmount}, subsidy_amount = #{subsidyAmount},
+            meal_allowance = #{mealAllowance}, transportation_allowance = #{transportationAllowance},
+            phone_allowance = #{phoneAllowance}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByMainId">
+        DELETE FROM fk_reim_subsidy WHERE main_id = #{mainId}
+    </delete>
+
+</mapper>

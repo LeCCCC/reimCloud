@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.reimcloud.mapper.FkReimMainMapper">
+
+    <sql id="queryConditions">
+        <where>
+            <if test="query.billNo != null and query.billNo != ''">
+                AND m.bill_no LIKE CONCAT('%', #{query.billNo}, '%')
+            </if>
+            <if test="query.reimbursementTitle != null and query.reimbursementTitle != ''">
+                AND m.reimbursement_title LIKE CONCAT('%', #{query.reimbursementTitle}, '%')
+            </if>
+            <if test="query.businessTripReason != null and query.businessTripReason != ''">
+                AND m.business_trip_reason LIKE CONCAT('%', #{query.businessTripReason}, '%')
+            </if>
+            <if test="query.reimCompanyId != null and query.reimCompanyId != ''">
+                AND m.reim_company_id = #{query.reimCompanyId}
+            </if>
+            <if test="query.reimDepartmentId != null and query.reimDepartmentId != ''">
+                AND m.reim_department_id = #{query.reimDepartmentId}
+            </if>
+            <if test="query.reimburserId != null and query.reimburserId != ''">
+                AND m.reimburser_id = #{query.reimburserId}
+            </if>
+            <if test="query.businessTypeId != null and query.businessTypeId != ''">
+                AND m.business_type_id = #{query.businessTypeId}
+            </if>
+            <if test="query.billStatus != null and query.billStatus != ''">
+                AND m.bill_status = #{query.billStatus}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectPage" resultType="org.example.reimcloud.entity.FkReimMain">
+        SELECT * FROM fk_reim_main m
+        <include refid="queryConditions"/>
+        ORDER BY m.creation_time DESC
+        LIMIT #{offset}, #{query.size}
+    </select>
+
+    <select id="countByQuery" resultType="long">
+        SELECT COUNT(*) FROM fk_reim_main m
+        <include refid="queryConditions"/>
+    </select>
+
+    <select id="selectById" resultType="org.example.reimcloud.entity.FkReimMain">
+        SELECT * FROM fk_reim_main WHERE id = #{id}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO fk_reim_main (id, bill_no, bill_status, creation_time, update_time,
+          reimbursement_title, reimburser_id, reimburser_no, reimburser_name,
+          reim_department_id, reim_department_no, reim_department_name,
+          reim_company_id, reim_company_no, reim_company_name,
+          business_type_id, business_type_no, business_type_name,
+          business_trip_reason, subsidy_total, meal_allowance,
+          transportation_allowance, phone_allowance, remarks)
+        VALUES (#{id}, #{billNo}, #{billStatus}, #{creationTime}, #{updateTime},
+          #{reimbursementTitle}, #{reimburserId}, #{reimburserNo}, #{reimburserName},
+          #{reimDepartmentId}, #{reimDepartmentNo}, #{reimDepartmentName},
+          #{reimCompanyId}, #{reimCompanyNo}, #{reimCompanyName},
+          #{businessTypeId}, #{businessTypeNo}, #{businessTypeName},
+          #{businessTripReason}, #{subsidyTotal}, #{mealAllowance},
+          #{transportationAllowance}, #{phoneAllowance}, #{remarks})
+    </insert>
+
+    <update id="updateDraft">
+        UPDATE fk_reim_main SET
+            update_time = #{updateTime},
+            reimbursement_title = #{reimbursementTitle},
+            reimburser_id = #{reimburserId}, reimburser_no = #{reimburserNo}, reimburser_name = #{reimburserName},
+            reim_department_id = #{reimDepartmentId}, reim_department_no = #{reimDepartmentNo}, reim_department_name = #{reimDepartmentName},
+            reim_company_id = #{reimCompanyId}, reim_company_no = #{reimCompanyNo}, reim_company_name = #{reimCompanyName},
+            business_type_id = #{businessTypeId}, business_type_no = #{businessTypeNo}, business_type_name = #{businessTypeName},
+            business_trip_reason = #{businessTripReason}, subsidy_total = #{subsidyTotal},
+            meal_allowance = #{mealAllowance}, transportation_allowance = #{transportationAllowance},
+            phone_allowance = #{phoneAllowance}, remarks = #{remarks}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE fk_reim_main SET bill_status = #{billStatus}, update_time = #{updateTime} WHERE id = #{id}
+    </update>
+
+    <update id="updateBillStatus">
+        UPDATE fk_reim_main SET bill_status = #{billStatus} WHERE id = #{id}
+    </update>
+
+    <select id="countToday" resultType="int">
+        SELECT COUNT(*) FROM fk_reim_main WHERE DATE(creation_time) = CURRENT_DATE
+    </select>
+
+</mapper>
