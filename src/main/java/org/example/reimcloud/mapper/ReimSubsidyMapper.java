@@ -18,4 +18,6 @@ public interface ReimSubsidyMapper {
     int update(ReimSubsidy subsidy);
 
     int deleteByMainId(@Param("mainId") String mainId);
+
+    int deleteById(@Param("id") String id);
 }

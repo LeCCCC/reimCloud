@@ -147,7 +147,10 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
         applyTotals(main, detail);
 
         deleteDetail(id);
-        mainMapper.updateDraft(main);
+        int rows = mainMapper.updateDraft(main);
+        if (rows == 0) {
+            throw new BusinessException("该单据状态已变更，请刷新后重试");
+        }
         insertDetail(id, detail, dto);
 
         return TravelReimbursementUpdateResult.builder().id(id).billStatus(BillStatus.DRAFT).updateTime(fmt(now)).build();
@@ -168,19 +171,26 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
         LocalDateTime now = LocalDateTime.now();
         main.setBillStatus(BillStatus.COMPLETED);
         main.setUpdateTime(now);
-        mainMapper.updateStatus(main);
+        int rows = mainMapper.updateStatus(main);
+        if (rows == 0) {
+            throw new BusinessException("该单据状态已变更，请刷新后重试");
+        }
 
         return SubmitResult.builder().id(id).billNo(main.getBillNo()).billStatus(BillStatus.COMPLETED).submitTime(fmt(now)).build();
     }
 
     // ========== 1.6 作废 ==========
     @Override
+    @Transactional
     public VoidResultVO voidReimbursement(String id) {
         FkReimMain main = requireMain(id);
         if (BillStatus.VOIDED.equals(main.getBillStatus())) {
             throw new BusinessException("该报销单已作废，不可重复作废");
         }
-        mainMapper.updateBillStatus(id, BillStatus.VOIDED);
+        int rows = mainMapper.updateBillStatus(id, BillStatus.VOIDED);
+        if (rows == 0) {
+            throw new BusinessException("该单据状态已变更，请刷新后重试");
+        }
         return VoidResultVO.builder().id(id).billStatus(BillStatus.VOIDED).build();
     }
 
@@ -215,22 +225,23 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
         validateTrip(dto);
         checkTripOverlap(id, tripId, dto);
 
-        ReimItinerary itinerary = buildItinerary(tripId, id, old.getSubsidyId(), dto);
-        itineraryMapper.update(itinerary);
+        String subsidyId = old.getSubsidyId();
+
+        // 删除该行程关联的补助日历和补助信息
+        calendarMapper.deleteBySubsidyId(subsidyId);
+        subsidyMapper.deleteById(subsidyId);
 
         // 重建补助日历
-        subsidyMapper.deleteByMainId(id);
-        calendarMapper.deleteByMainId(id);
-        String newSubsidyId = Ids.newId();
-        itinerary.setSubsidyId(newSubsidyId);
+        ReimSubsidy subsidy = buildSubsidy(subsidyId, id, dto);
+        subsidyMapper.insert(subsidy);
+        buildAndInsertCalendars(subsidyId, dto);
+
+        // 更新行程
+        ReimItinerary itinerary = buildItinerary(tripId, id, subsidyId, dto);
         itineraryMapper.update(itinerary);
 
-        ReimSubsidy subsidy = buildSubsidy(newSubsidyId, id, dto);
-        subsidyMapper.insert(subsidy);
-        buildAndInsertCalendars(newSubsidyId, dto);
-
         recalcMain(id);
-        return toTripVO(itinerary, newSubsidyId);
+        return toTripVO(itinerary, subsidyId);
     }
 
     // ========== 2.3 删除行程 ==========
@@ -238,9 +249,12 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
     @Transactional
     public void deleteTrip(String id, String tripId) {
         requireMain(id);
+        ReimItinerary itinerary = itineraryMapper.selectById(tripId);
+        if (itinerary == null) throw new BusinessException("补录行程不存在");
+        String subsidyId = itinerary.getSubsidyId();
         itineraryMapper.deleteById(tripId);
-        subsidyMapper.deleteByMainId(id);
-        calendarMapper.deleteByMainId(id);
+        calendarMapper.deleteBySubsidyId(subsidyId);
+        subsidyMapper.deleteById(subsidyId);
         recalcMain(id);
     }
 
@@ -318,7 +332,7 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
     @Override
     @Transactional
     public List<AllocationVO> saveAllocations(String id, List<AllocationDTO> list) {
-        FkReimMain main = requireMain(id);
+        FkReimMain main = requireMainForUpdate(id);
         if (list == null || list.isEmpty()) throw new BusinessException("至少保留一条分摊信息");
 
         BigDecimal totalRatio = ZERO;
@@ -380,9 +394,20 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
         return main;
     }
 
+    private FkReimMain requireMainForUpdate(String id) {
+        FkReimMain main = mainMapper.selectByIdForUpdate(id);
+        if (main == null) throw new BusinessException("404", "报销单不存在");
+        return main;
+    }
+
     private String nextBillNo() {
-        int seq = mainMapper.countToday() + 1;
-        return "CLBX" + LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE) + String.format("%04d", seq);
+        mainMapper.getLock("reim_bill_no_lock", 10);
+        try {
+            int seq = mainMapper.countToday() + 1;
+            return "CLBX" + LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE) + String.format("%04d", seq);
+        } finally {
+            mainMapper.releaseLock("reim_bill_no_lock");
+        }
     }
 
     private void validateBase(TravelReimbursementSaveDTO dto) {
@@ -571,7 +596,7 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
     }
 
     private void recalcMain(String mainId) {
-        FkReimMain main = requireMain(mainId);
+        FkReimMain main = requireMainForUpdate(mainId);
         List<ReimSubsidy> subsidies = subsidyMapper.selectByMainId(mainId);
         BigDecimal meal = subsidies.stream().map(ReimSubsidy::getMealAllowance).reduce(ZERO, BigDecimal::add);
         BigDecimal traffic = subsidies.stream().map(ReimSubsidy::getTransportationAllowance).reduce(ZERO, BigDecimal::add);
@@ -585,7 +610,7 @@ public class TravelReimbursementServiceImpl implements TravelReimbursementServic
     }
 
     private void recalcMainFromCalendars(String mainId) {
-        FkReimMain main = requireMain(mainId);
+        FkReimMain main = requireMainForUpdate(mainId);
         List<ReimSubsidy> subsidies = subsidyMapper.selectByMainId(mainId);
         BigDecimal totalMeal = ZERO, totalTraffic = ZERO, totalPhone = ZERO, totalSubsidy = ZERO;
         for (ReimSubsidy sub : subsidies) {

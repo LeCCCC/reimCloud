@@ -33,4 +33,8 @@
         )
     </delete>
 
+    <delete id="deleteBySubsidyId">
+        DELETE FROM fk_subsidy_calendar WHERE subsidy_id = #{subsidyId}
+    </delete>
+
 </mapper>

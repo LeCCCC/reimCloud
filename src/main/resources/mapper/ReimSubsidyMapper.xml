@@ -35,4 +35,8 @@
         DELETE FROM fk_reim_subsidy WHERE main_id = #{mainId}
     </delete>
 
+    <delete id="deleteById">
+        DELETE FROM fk_reim_subsidy WHERE id = #{id}
+    </delete>
+
 </mapper>

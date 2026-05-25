@@ -26,4 +26,10 @@ public interface FkReimMainMapper {
     int updateBillStatus(@Param("id") String id, @Param("billStatus") String billStatus);
 
     int countToday();
+
+    FkReimMain selectByIdForUpdate(@Param("id") String id);
+
+    int getLock(@Param("lockName") String lockName, @Param("timeout") int timeout);
+
+    int releaseLock(@Param("lockName") String lockName);
 }

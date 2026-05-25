@@ -76,19 +76,33 @@
             business_trip_reason = #{businessTripReason}, subsidy_total = #{subsidyTotal},
             meal_allowance = #{mealAllowance}, transportation_allowance = #{transportationAllowance},
             phone_allowance = #{phoneAllowance}, remarks = #{remarks}
-        WHERE id = #{id}
+        WHERE id = #{id} AND bill_status = '0'
     </update>
 
     <update id="updateStatus">
-        UPDATE fk_reim_main SET bill_status = #{billStatus}, update_time = #{updateTime} WHERE id = #{id}
+        UPDATE fk_reim_main SET bill_status = #{billStatus}, update_time = #{updateTime}
+        WHERE id = #{id} AND bill_status = '0'
     </update>
 
     <update id="updateBillStatus">
-        UPDATE fk_reim_main SET bill_status = #{billStatus} WHERE id = #{id}
+        UPDATE fk_reim_main SET bill_status = #{billStatus}
+        WHERE id = #{id} AND bill_status != '2'
     </update>
 
     <select id="countToday" resultType="int">
         SELECT COUNT(*) FROM fk_reim_main WHERE DATE(creation_time) = CURRENT_DATE
+    </select>
+
+    <select id="selectByIdForUpdate" resultType="org.example.reimcloud.entity.FkReimMain">
+        SELECT * FROM fk_reim_main WHERE id = #{id} FOR UPDATE
+    </select>
+
+    <select id="getLock" resultType="int">
+        SELECT GET_LOCK(#{lockName}, #{timeout})
+    </select>
+
+    <select id="releaseLock" resultType="int">
+        SELECT RELEASE_LOCK(#{lockName})
     </select>
 
 </mapper>

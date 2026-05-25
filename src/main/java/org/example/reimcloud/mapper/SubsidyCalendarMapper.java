@@ -16,4 +16,6 @@ public interface SubsidyCalendarMapper {
     int update(SubsidyCalendar calendar);
 
     int deleteByMainId(@Param("mainId") String mainId);
+
+    int deleteBySubsidyId(@Param("subsidyId") String subsidyId);
 }
