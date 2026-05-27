@@ -6,12 +6,21 @@ import {
   getEmployeeOptionsAPI
 } from '@/apis/selectOptions'
 
+function mapBusinessTypeTree(nodes = []) {
+  return nodes.map((node) => ({
+    businessTypeId: node.businessTypeId,
+    businessTypeNo: node.businessTypeNo,
+    businessTypeName: node.businessTypeName,
+    disabled: Boolean(node.children?.length),
+    children: mapBusinessTypeTree(node.children || [])
+  }))
+}
+
 function flattenBusinessTypeTree(nodes = []) {
   return nodes.flatMap((node) => {
     if (node.children?.length) {
       return flattenBusinessTypeTree(node.children)
     }
-
     return [
       {
         businessTypeId: node.businessTypeId,
@@ -23,11 +32,10 @@ function flattenBusinessTypeTree(nodes = []) {
 }
 
 export function useBusinessTypeOptions() {
-  const loading = ref(false)
-
   const companyOptions = ref([])
   const departmentOptions = ref([])
   const employeeOptions = ref([])
+  const businessTypeTreeOptions = ref([])
   const businessTypeOptions = ref([])
 
   const businessTypeSelectOptions = computed(() =>
@@ -43,28 +51,23 @@ export function useBusinessTypeOptions() {
 
   async function loadBusinessTypeOptions(params) {
     const res = await getBusinessTypeOptionsAPI(params)
+    businessTypeTreeOptions.value = mapBusinessTypeTree(res?.data || [])
     businessTypeOptions.value = flattenBusinessTypeTree(res?.data || [])
     return businessTypeOptions.value
   }
 
   async function loadCommonSelectOptions() {
-    loading.value = true
-
-    try {
       const [companyRes, departmentRes, employeeRes, businessTypeRes] = await Promise.all([
         getCompanyOptionsAPI(),
         getDepartmentOptionsAPI(),
         getEmployeeOptionsAPI(),
         getBusinessTypeOptionsAPI()
       ])
-
       companyOptions.value = companyRes?.data || []
       departmentOptions.value = departmentRes?.data || []
       employeeOptions.value = employeeRes?.data || []
+      businessTypeTreeOptions.value = mapBusinessTypeTree(businessTypeRes?.data || [])
       businessTypeOptions.value = flattenBusinessTypeTree(businessTypeRes?.data || [])
-    } finally {
-      loading.value = false
-    }
   }
 
   function getBusinessTypeById(id) {
@@ -72,10 +75,10 @@ export function useBusinessTypeOptions() {
   }
 
   return {
-    loading,
     companyOptions,
     departmentOptions,
     employeeOptions,
+    businessTypeTreeOptions,
     businessTypeOptions,
     businessTypeSelectOptions,
     businessTypeMap,

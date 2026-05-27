@@ -19,14 +19,16 @@ defineProps({
   businessTypeOptions: {
     type: Array,
     default: () => []
-  },
-  billStatusOptions: {
-    type: Array,
-    default: () => []
   }
 })
 
 const emit = defineEmits(['search', 'reset', 'add'])
+
+const billStatusOptions = [
+  { label: '草稿', value: '0' },
+  { label: '已完成', value: '1' },
+  { label: '已作废', value: '2' }
+]
 </script>
 
 <template>

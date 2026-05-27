@@ -46,8 +46,6 @@ defineEmits(['toggle'])
           <el-input
             v-model="form.reimbursementTitle"
             :disabled="isReadonly"
-            maxlength="500"
-            :show-word-limit="!isReadonly"
             placeholder="请输入报销标题"
           />
         </el-form-item>
@@ -101,18 +99,23 @@ defineEmits(['toggle'])
 
         <div class="three-columns">
           <el-form-item label="业务类型">
-            <el-select
+            <el-tree-select
               v-model="form.businessTypeId"
               :disabled="isReadonly"
+              :data="businessTypeOptions"
+              :props="{
+                label: 'businessTypeName',
+                value: 'businessTypeId',
+                children: 'children',
+                disabled: 'disabled'
+              }"
+              check-strictly
+              clearable
+              filterable
+              node-key="businessTypeId"
               placeholder="请选择"
-            >
-              <el-option
-                v-for="item in businessTypeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
+              render-after-expand="false"
+            />
           </el-form-item>
         </div>
 
@@ -122,8 +125,6 @@ defineEmits(['toggle'])
             :disabled="isReadonly"
             type="textarea"
             :rows="3"
-            maxlength="500"
-            :show-word-limit="!isReadonly"
             placeholder="请输入出差事由"
           />
         </el-form-item>
@@ -190,12 +191,14 @@ defineEmits(['toggle'])
   white-space: nowrap;
 }
 
-:deep(.el-select) {
+:deep(.el-select),
+:deep(.el-tree-select) {
   width: 100%;
 }
 
 :deep(.el-input__wrapper),
 :deep(.el-select__wrapper),
+:deep(.el-tree-select .el-select__wrapper),
 :deep(.el-textarea__inner) {
   border-radius: 8px;
   box-shadow: 0 0 0 1px #dce4ef inset;

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>前端开发自测报告-差旅报销单系统</title>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", "SimSun", sans-serif;
+      font-size: 12pt;
+      line-height: 1.6;
+      color: #222;
+      margin: 24px 36px;
+    }
+    h1, h2, h3 {
+      margin: 0 0 12px;
+      color: #1f3f75;
+    }
+    h1 {
+      text-align: center;
+      font-size: 20pt;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 14pt;
+      margin-top: 20px;
+      border-left: 4px solid #4b79d8;
+      padding-left: 8px;
+    }
+    p {
+      margin: 6px 0;
+      text-indent: 2em;
+    }
+    .meta-table, .detail-table, .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 18px;
+    }
+    .meta-table td, .detail-table th, .detail-table td, .summary-table th, .summary-table td {
+      border: 1px solid #666;
+      padding: 8px 10px;
+      vertical-align: top;
+    }
+    .meta-table td.label {
+      width: 16%;
+      background: #f4f7fb;
+      font-weight: 700;
+      text-align: center;
+    }
+    .detail-table th, .summary-table th {
+      background: #dfe8f7;
+      text-align: center;
+      font-weight: 700;
+    }
+    .pass {
+      color: #0b7a28;
+      font-weight: 700;
+    }
+    .risk {
+      color: #b85a00;
+      font-weight: 700;
+    }
+    ul {
+      margin: 6px 0 6px 22px;
+    }
+    li {
+      margin: 4px 0;
+    }
+    .note {
+      color: #555;
+      font-size: 10.5pt;
+    }
+  </style>
+</head>
+<body>
+  <h1>前端开发自测报告</h1>
+
+  <table class="meta-table">
+    <tr>
+      <td class="label">项目名称</td>
+      <td>差旅报销单系统</td>
+      <td class="label">报告类型</td>
+      <td>前端开发自测报告</td>
+    </tr>
+    <tr>
+      <td class="label">对应模块</td>
+      <td>报销单列表、报销单详情（基础信息/补录行程/补助信息/费用分摊）</td>
+      <td class="label">对应设计文档</td>
+      <td>《差旅报销单系统详细设计规范》2026-05-23</td>
+    </tr>
+    <tr>
+      <td class="label">代码范围</td>
+      <td colspan="3">`src/views/ReimbursementListView/*`、`src/views/ReimbursementDetailView/*`、`src/composables/useReimbursementSelectOptions.js`</td>
+    </tr>
+    <tr>
+      <td class="label">自测日期</td>
+      <td>2026-05-25</td>
+      <td class="label">自测人</td>
+      <td>待补充</td>
+    </tr>
+  </table>
+
+  <h2>一、开发实现范围说明</h2>
+  <p>本次前端开发内容主要覆盖详细设计规范中的报销单分页列表、报销单新增/编辑/详情回显、补录行程管理、补助日历管理、费用分摊管理及提交前校验相关页面能力。前端通过列表页和详情页承接核心业务流程，包含基础数据下拉加载、草稿保存、提交完成、补助明细编辑、分摊联动计算等交互逻辑。</p>
+  <p>结合当前代码实现情况，本报告重点针对以下功能进行自测：列表筛选与分页、详情页基础信息录入、补录行程新增编辑删除、补助日历自动生成与编辑、费用分摊联动与校验、保存/提交及只读态控制。</p>
+
+  <h2>二、自测环境与方法</h2>
+  <table class="summary-table">
+    <tr>
+      <th style="width: 20%;">项目</th>
+      <th>说明</th>
+    </tr>
+    <tr>
+      <td>运行环境</td>
+      <td>Windows 本地开发环境，Vite 前端工程</td>
+    </tr>
+    <tr>
+      <td>自测方式</td>
+      <td>代码走查 + 页面逻辑核对 + 本地构建验证</td>
+    </tr>
+    <tr>
+      <td>接口依据</td>
+      <td>设计规范中 TravelReimbursement 及 BaseData 相关接口定义</td>
+    </tr>
+    <tr>
+      <td>构建验证</td>
+      <td>`npm run build` 执行通过，未出现阻断性编译错误</td>
+    </tr>
+  </table>
+
+  <h2>三、自测结果汇总</h2>
+  <table class="summary-table">
+    <tr>
+      <th style="width: 20%;">统计项</th>
+      <th style="width: 20%;">数量</th>
+      <th>说明</th>
+    </tr>
+    <tr>
+      <td>自测功能点</td>
+      <td>15</td>
+      <td>依据详细设计规范与当前前端页面实现整理</td>
+    </tr>
+    <tr>
+      <td>通过项</td>
+      <td class="pass">13</td>
+      <td>主流程及核心交互已具备前端支撑能力</td>
+    </tr>
+    <tr>
+      <td>风险/待确认项</td>
+      <td class="risk">2</td>
+      <td>存在少量与详细设计存在偏差或仍需联调确认的点</td>
+    </tr>
+    <tr>
+      <td>总体结论</td>
+      <td colspan="2" class="pass">当前版本具备提测基础，建议进入接口联调和业务测试阶段</td>
+    </tr>
+  </table>
+
+  <h2>四、自测明细</h2>
+  <table class="detail-table">
+    <tr>
+      <th style="width: 5%;">序号</th>
+      <th style="width: 14%;">模块</th>
+      <th style="width: 24%;">设计要求</th>
+      <th style="width: 35%;">前端实现及自测结论</th>
+      <th style="width: 8%;">结果</th>
+      <th style="width: 14%;">备注</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>报销单分页列表</td>
+      <td>支持按单号、标题、事由、公司、部门、报销人、业务类型、状态等条件筛选，并支持分页展示。</td>
+      <td>列表页实现了查询表单、分页参数、查询/重置、分页切换及列表刷新令牌机制；调用 `getReimbursementListAPI` 获取数据。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.1</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>列表操作</td>
+      <td>支持查看、编辑、作废等操作；已完成单据不可编辑。</td>
+      <td>列表表格提供查看、编辑、更多操作；编辑前校验 `billStatus === '1'` 时禁止编辑；作废前二次确认并调用 `voidReimbursementAPI`。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.4、2.6</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>详情初始化</td>
+      <td>新增时初始化草稿，编辑/查看时回显详情数据和基础下拉选项。</td>
+      <td>详情页通过 `loadSelectOptions` 加载公司、部门、员工、业务类型、城市、项目等选项；`loadDetail` 根据路由 ID 回显单据。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.2、2.3</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>基础信息</td>
+      <td>校验报销标题、事由、报销人、部门、公司、业务类型必填，长度符合规范。</td>
+      <td>`validateBaseInfo` 对标题、事由、备注长度和必填项进行校验；提交、保存草稿前均会触发。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.2.2-a</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>补录行程新增/编辑/复制</td>
+      <td>支持补录行程，包含出行人、城市、日期范围、行程说明。</td>
+      <td>行程区提供新增、编辑、复制入口；`TripEditorDialog` 支持行程录入，父层保存后回写 `detailForm.tripList`。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.7</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>行程校验</td>
+      <td>同一出行人的日期不可重复/重叠；到达日期不可早于出发日期，也不可晚于当前日期。</td>
+      <td>`validateTripForm` 与 `validateTripDuplicate` 已实现日期合法性和区间冲突校验，删除行程时有确认提示。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.7.2</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>行程联动补助</td>
+      <td>行程保存后自动生成补助信息及补助日历；删除后同步移除关联补助。</td>
+      <td>`rebuildSubsidyList` 会在新增、编辑、删除行程后重建补助列表，并同步触发分摊金额重算。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.7、2.8</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>补助日历自动生成</td>
+      <td>根据出差日期范围、星期、到达城市类型自动生成餐补/交补/话补标准。</td>
+      <td>`useSubsidyManager` 根据起止日期逐天生成日历，按城市类型匹配餐补标准，交通/通讯标准固定为 40 元/天。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.8.1</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>补助日历弹窗</td>
+      <td>支持查看和编辑补助日历，显示标准金额、补助金额、城市、天数等信息。</td>
+      <td>已实现独立 `SubsidyCalendarDialog` 组件，支持左侧摘要、右侧日历表格、补助城市展示及补助金额汇总。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.8</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>补助选择交互</td>
+      <td>支持全选、按日期横向选择、按补助项纵向选择；只有全部选中时表头/日期复选框才为选中态。</td>
+      <td>补助弹窗内已实现全选、行选、列选及选中态联动；未选中时输入框禁用，金额限制不超过标准金额。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 5.6-5.9</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>补助金额保存校验</td>
+      <td>选中项金额需为正数且不超过标准金额；未选中项金额应置零。</td>
+      <td>当前前端已限制金额非负且不超过标准金额，并在保存前执行 `validateSubsidyCalendarList`。但未选中项在前端草稿态未显式清零，需与后端联调确认最终落库结果。</td>
+      <td class="risk">风险</td>
+      <td>建议联调时重点确认</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>费用分摊</td>
+      <td>至少保留一条分摊；比例合计 100%；金额合计等于补助总额；支持均摊。</td>
+      <td>`useAllocationManager` 已实现默认首行、比例输入联动、删除保护、均摊计算、payload 构建和比例/金额校验。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.9</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>草稿保存/关闭</td>
+      <td>关闭时支持提示是否先保存草稿；新增和编辑都可保存当前数据。</td>
+      <td>`confirmClose` 支持“保存并关闭/直接关闭”；新增走 `createReimbursementAPI`，编辑走 `updateReimbursementAPI`。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.2、2.4</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>提交完成</td>
+      <td>提交前至少存在一条补录行程；提交后状态为已完成且不可再编辑。</td>
+      <td>`submitAndComplete` 会先执行基础校验和行程数量校验，再保存并调用 `submitReimbursementAPI`；页面监听已完成单据自动切只读态。</td>
+      <td class="pass">通过</td>
+      <td>对应设计 2.5</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>自动化测试与联调准备</td>
+      <td>前端应具备可提测状态，并提供基本自测依据。</td>
+      <td>当前已完成本地构建验证，但仓库内暂未见前端自动化单测/端到端测试；后续仍建议补充接口联调记录和测试用例留痕。</td>
+      <td class="risk">风险</td>
+      <td>不影响当前提测，但建议补强</td>
+    </tr>
+  </table>
+
+  <h2>五、构建与验证记录</h2>
+  <table class="summary-table">
+    <tr>
+      <th style="width: 20%;">验证项</th>
+      <th style="width: 15%;">结果</th>
+      <th>说明</th>
+    </tr>
+    <tr>
+      <td>项目构建</td>
+      <td class="pass">通过</td>
+      <td>执行 `npm run build` 成功，未出现阻断性错误。</td>
+    </tr>
+    <tr>
+      <td>代码结构核对</td>
+      <td class="pass">通过</td>
+      <td>列表页、详情页、补助弹窗、行程弹窗、分摊逻辑、公共工具及校验逻辑已形成清晰模块划分。</td>
+    </tr>
+    <tr>
+      <td>设计对照检查</td>
+      <td class="pass">基本通过</td>
+      <td>大部分前端设计点已有实现，存在少量待联调确认项。</td>
+    </tr>
+  </table>
+
+  <h2>六、遗留问题与风险说明</h2>
+  <ul>
+    <li>补助日历未选中项在前端保存草稿阶段未显式置零，虽然已限制不可编辑，但最终是否严格按设计“未选中即置零”仍需结合后端保存逻辑联调确认。</li>
+    <li>当前主要完成了页面逻辑自测和本地构建验证，尚未形成自动化测试用例及截图留痕，建议测试阶段补充接口联调记录与关键流程截图。</li>
+  </ul>
+
+  <h2>七、自测结论</h2>
+  <p>根据《差旅报销单系统详细设计规范》及当前前端代码实现情况，本次差旅报销单模块前端开发已完成列表页、详情页主流程、补录行程、补助编辑、费用分摊及保存提交等核心功能开发，自测结果整体可控，具备进入联调和测试阶段的基础。</p>
+  <p>建议后续重点关注补助日历未选中项金额清零逻辑及接口联调验证，并在测试阶段补充自动化或截图类留痕材料，以提升交付完整度。</p>
+
+  <h2>八、核心代码实现对应关系</h2>
+  <table class="summary-table">
+    <tr>
+      <th style="width: 28%;">代码文件</th>
+      <th>说明</th>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementListView/ReimbursementListView.vue`</td>
+      <td>列表页主逻辑，负责查询、重置、分页、跳转、作废、复制单号等操作。</td>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementListView/components/ListTablePanel.vue`</td>
+      <td>列表表格展示与分页交互。</td>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementDetailView/ReimbursementDetailView.vue`</td>
+      <td>详情页整体编排，负责装配基础信息、行程、补助、费用合计、分摊、备注等分区组件。</td>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementDetailView/composables/useReimbursementDetail.js`</td>
+      <td>详情页主业务逻辑，负责页面初始化、接口调用、表单回显、保存提交、页面模式控制。</td>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementDetailView/composables/useTripEditor.js`</td>
+      <td>补录行程保存、删除、payload 构建及与补助信息的联动处理。</td>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementDetailView/composables/useSubsidyManager.js`</td>
+      <td>补助日历自动生成、补助弹窗打开/保存、补助金额汇总与补助列表回写。</td>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementDetailView/composables/useAllocationManager.js`</td>
+      <td>分摊信息新增、删除、均摊、比例联动、分摊 payload 构建与校验。</td>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementDetailView/composables/reimbursementDetailValidators.js`</td>
+      <td>基础信息、行程、补助日历、费用分摊等业务校验规则。</td>
+    </tr>
+    <tr>
+      <td>`src/views/ReimbursementDetailView/components/SubsidyCalendarDialog.vue`</td>
+      <td>补助日历弹窗 UI，承载全选、横向/纵向勾选、金额输入限制等交互。</td>
+    </tr>
+  </table>
+
+  <h2>九、自测依据</h2>
+  <ul>
+    <li>详细设计依据：`差旅报销单系统详细设计规范.docx` 中 2.1 ~ 2.9 章节。</li>
+    <li>代码依据：当前工作区 `ReimbursementListView` 与 `ReimbursementDetailView` 相关实现文件。</li>
+    <li>构建依据：本地执行 `npm run build` 通过。</li>
+    <li>交互依据：页面现有 Element Plus 表单、表格、弹窗和路由跳转逻辑。</li>
+  </ul>
+
+  <p class="note">说明：由于提供的模板文件为旧版 `.doc` 格式，且当前环境缺少可直接解析该格式的 Office/LibreOffice 组件，本报告以 Word 可打开的 `.doc` 文档形式生成，内容依据详细设计规范与当前前端代码实现整理。</p>
+</body>
+</html>

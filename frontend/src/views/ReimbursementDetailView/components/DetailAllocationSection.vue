@@ -1,7 +1,14 @@
+//费用分摊
 <script setup>
 import { Delete, Plus } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  applyAllocationCompany,
+  createAllocationRow,
+  normalizeAllocationRows
+} from '../composables/allocationRows'
 
-defineProps({
+const props = defineProps({
   open: {
     type: Boolean,
     default: true
@@ -40,15 +47,99 @@ defineProps({
   }
 })
 
-defineEmits([
-  'toggle',
-  'equalize',
-  'update-company',
-  'update-project',
-  'ratio-change',
-  'delete-row',
-  'add-row'
-])
+const emit = defineEmits(['toggle', 'update:allocationList'])
+
+function emitRows(rows) {
+  emit('update:allocationList', rows)
+}
+
+function updateAllocationCompany(index, value) {
+  const nextList = props.allocationList.map((item) => ({ ...item }))
+  const row = nextList[index]
+  if (!row) return
+  applyAllocationCompany(row, value, new Map(props.companyOptions.map((item) => [item.id, item])))
+  emitRows(nextList)
+}
+
+function updateAllocationProject(index, value) {
+  const nextList = props.allocationList.map((item) => ({ ...item }))
+  const row = nextList[index]
+  if (!row) return
+
+  const matched = new Map(props.projectOptions.map((item) => [item.projectId, item])).get(value)
+  row.projectId = value
+  row.projectNo = matched?.projectNo || ''
+  row.projectName = matched?.projectName || ''
+  emitRows(nextList)
+}
+
+function handleAllocationRatioInput(index, value) {
+  if (index === 0) return
+
+  const nextList = props.allocationList.map((item) => ({ ...item }))
+  const currentValue = Number(value || 0)
+  const others = nextList.filter((_, rowIndex) => rowIndex !== 0 && rowIndex !== index)
+  const othersTotal = others.reduce((sum, item) => sum + Number(item.allocationRatioPercent || 0), 0)
+
+  if (othersTotal + currentValue > 100) {
+    nextList[index].allocationRatioPercent = null
+    ElMessage.warning('除首行外的分摊比例合计不能超过 100%')
+  } else {
+    nextList[index].allocationRatioPercent = Number(currentValue.toFixed(2))
+  }
+
+  normalizeAllocationRows(nextList, props.subsidyTotal)
+  emitRows(nextList)
+}
+
+function handleAddAllocationRow() {
+  const nextList = [...props.allocationList.map((item) => ({ ...item })), createAllocationRow()]
+  normalizeAllocationRows(nextList, props.subsidyTotal)
+  emitRows(nextList)
+}
+
+async function handleDeleteAllocationRow(index) {
+  if (props.allocationList.length === 1) {
+    ElMessage.warning('至少保留一条分摊信息')
+    return
+  }
+
+  await ElMessageBox.confirm('确定删除吗？', '提示', {
+    type: 'warning',
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  })
+
+  const nextList = props.allocationList.map((item) => ({ ...item }))
+  nextList.splice(index, 1)
+  normalizeAllocationRows(nextList, props.subsidyTotal)
+  emitRows(nextList)
+}
+
+function handleEqualAllocation() {
+  const nextList = props.allocationList.map((item) => ({ ...item }))
+  const total = Number(props.subsidyTotal || 0)
+
+  if (nextList.length === 0) return
+
+  const basePercent = Number((100 / nextList.length).toFixed(2))
+  const restPercent = Number((basePercent * (nextList.length - 1)).toFixed(2))
+  nextList[0].allocationRatioPercent = Number((100 - restPercent).toFixed(2))
+
+  for (let index = 1; index < nextList.length; index += 1) {
+    nextList[index].allocationRatioPercent = basePercent
+  }
+
+  const averageAmount = Number((total / nextList.length).toFixed(2))
+  const restAmount = Number((averageAmount * (nextList.length - 1)).toFixed(2))
+  nextList[0].allocationAmount = Number((total - restAmount).toFixed(2))
+
+  for (let index = 1; index < nextList.length; index += 1) {
+    nextList[index].allocationAmount = averageAmount
+  }
+
+  emitRows(nextList)
+}
 </script>
 
 <template>
@@ -56,7 +147,7 @@ defineEmits([
     <div class="section-header" @click="$emit('toggle')">
       <div class="section-title">费用归属及分摊（分摊金额：{{ subsidyTotal }}）</div>
       <div class="section-actions" @click.stop>
-        <el-button v-if="!isReadonly" type="primary" plain @click="$emit('equalize')">均摊</el-button>
+        <el-button v-if="!isReadonly" type="primary" plain @click="handleEqualAllocation">均摊</el-button>
         <span class="section-switch">{{ open ? '收起' : '展开' }}</span>
       </div>
     </div>
@@ -70,7 +161,7 @@ defineEmits([
               :disabled="isReadonly"
               filterable
               placeholder="请选择"
-              @update:model-value="(value) => $emit('update-company', $index, value)"
+              @update:model-value="(value) => updateAllocationCompany($index, value)"
             >
               <el-option
                 v-for="item in companyOptions"
@@ -88,7 +179,7 @@ defineEmits([
               :disabled="isReadonly"
               filterable
               placeholder="请选择"
-              @update:model-value="(value) => $emit('update-project', $index, value)"
+              @update:model-value="(value) => updateAllocationProject($index, value)"
             >
               <el-option
                 v-for="item in projectOptions"
@@ -108,7 +199,7 @@ defineEmits([
               :max="100"
               :precision="2"
               controls-position="right"
-              @update:model-value="(value) => $emit('ratio-change', $index, value)"
+              @update:model-value="(value) => handleAllocationRatioInput($index, value)"
             />
             <span class="suffix">%</span>
           </template>
@@ -120,14 +211,14 @@ defineEmits([
         </el-table-column>
         <el-table-column v-if="!isReadonly" label="操作" width="90" align="center">
           <template #default="{ $index }">
-            <el-icon class="action-icon danger" @click="$emit('delete-row', $index)">
+            <el-icon class="action-icon danger" @click="handleDeleteAllocationRow($index)">
               <Delete />
             </el-icon>
           </template>
         </el-table-column>
       </el-table>
 
-      <div v-if="!isReadonly" class="allocation-add-line" @click="$emit('add-row')">
+      <div v-if="!isReadonly" class="allocation-add-line" @click="handleAddAllocationRow">
         <el-icon><Plus /></el-icon>
         添加一行
       </div>

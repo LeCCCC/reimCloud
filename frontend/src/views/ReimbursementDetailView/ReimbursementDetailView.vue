@@ -6,23 +6,19 @@ import DetailRemarkSection from './components/DetailRemarkSection.vue'
 import DetailSubsidySection from './components/DetailSubsidySection.vue'
 import DetailSummarySection from './components/DetailSummarySection.vue'
 import DetailTripSection from './components/DetailTripSection.vue'
-import TripEditorDialog from './components/TripEditorDialog.vue'
 import { useReimbursementDetail } from './composables/useReimbursementDetail'
 
 const {
   loading,
   submitLoading,
-  tripDialogVisible,
-  tripDialogMode,
   companyOptions,
   departmentOptions,
   employeeOptions,
-  businessTypeSelectOptions,
+  businessTypeTreeOptions,
   cityOptions,
   projectOptions,
   sectionState,
   detailForm,
-  tripDialogForm,
   isReadonly,
   pageTitle,
   billDate,
@@ -30,20 +26,9 @@ const {
   allocationTotalAmount,
   allocationTotalPercent,
   toggleSection,
-  updateAllocationCompany,
-  updateAllocationProject,
   toMoney,
-  handleAllocationRatioInput,
-  handleAddAllocationRow,
-  handleDeleteAllocationRow,
-  handleEqualAllocation,
-  openCreateTripDialog,
-  openEditTripDialog,
-  openCopyTripDialog,
-  handleTripDialogSubmit,
-  handleDeleteTrip,
-  openSubsidyDialog,
-  clearRemarksWithConfirm,
+  rebuildSubsidyList,
+  normalizeAllocationRows,
   confirmClose,
   submitAndComplete
 } = useReimbursementDetail()
@@ -59,35 +44,38 @@ const {
 
     <div class="detail-shell">
       <DetailBasicInfoSection
-        :open="sectionState.base"
+        :open="sectionState.basic"
         :is-readonly="isReadonly"
         :form="detailForm"
         :employee-options="employeeOptions"
         :department-options="departmentOptions"
         :company-options="companyOptions"
-        :business-type-options="businessTypeSelectOptions"
-        @toggle="toggleSection('base')"
+        :business-type-options="businessTypeTreeOptions"
+        @toggle="toggleSection('basic')"
       />
 
       <DetailTripSection
         :open="sectionState.trip"
         :is-readonly="isReadonly"
-        :trip-list="detailForm.tripList"
+        v-model:trip-list="detailForm.tripList"
+        :employee-options="employeeOptions"
+        :city-options="cityOptions"
         @toggle="toggleSection('trip')"
-        @add="openCreateTripDialog"
-        @edit="openEditTripDialog"
-        @copy="openCopyTripDialog"
-        @delete="handleDeleteTrip"
+        @changed="rebuildSubsidyList"
       />
 
       <DetailSubsidySection
         :open="sectionState.subsidy"
-        :subsidy-list="detailForm.subsidyList"
+        v-model:subsidy-list="detailForm.subsidyList"
+        :trip-list="detailForm.tripList"
+        :detail-id="detailForm.id"
+        :business-type-name="detailForm.businessTypeName"
+        :city-options="cityOptions"
         :trip-count="detailForm.tripList.length"
         :cost-summary="costSummary"
         :is-readonly="isReadonly"
         @toggle="toggleSection('subsidy')"
-        @edit="openSubsidyDialog"
+        @changed="normalizeAllocationRows"
       />
 
       <DetailSummarySection
@@ -99,7 +87,7 @@ const {
       <DetailAllocationSection
         :open="sectionState.allocation"
         :is-readonly="isReadonly"
-        :allocation-list="detailForm.allocationList"
+        v-model:allocation-list="detailForm.allocationList"
         :company-options="companyOptions"
         :project-options="projectOptions"
         :subsidy-total="costSummary.subsidyTotal"
@@ -107,12 +95,6 @@ const {
         :allocation-total-amount="allocationTotalAmount"
         :to-money="toMoney"
         @toggle="toggleSection('allocation')"
-        @equalize="handleEqualAllocation"
-        @update-company="updateAllocationCompany"
-        @update-project="updateAllocationProject"
-        @ratio-change="handleAllocationRatioInput"
-        @delete-row="handleDeleteAllocationRow"
-        @add-row="handleAddAllocationRow"
       />
 
       <DetailRemarkSection
@@ -121,7 +103,6 @@ const {
         :remarks="detailForm.remarks"
         @toggle="toggleSection('remark')"
         @update:remarks="detailForm.remarks = $event"
-        @clear="clearRemarksWithConfirm"
       />
     </div>
 
@@ -131,15 +112,6 @@ const {
         提交
       </el-button>
     </div>
-
-    <TripEditorDialog
-      v-model:visible="tripDialogVisible"
-      :mode="tripDialogMode"
-      :form="tripDialogForm"
-      :employee-options="employeeOptions"
-      :city-options="cityOptions"
-      @submit="handleTripDialogSubmit"
-    />
   </div>
 </template>
 

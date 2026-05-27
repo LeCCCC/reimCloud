@@ -1,14 +1,12 @@
 <script setup>
 import { Edit, MoreFilled, View } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { voidReimbursementAPI } from '@/apis/reimbursement'
 
 const props = defineProps({
   tableData: {
     type: Array,
     default: () => []
-  },
-  loading: {
-    type: Boolean,
-    default: false
   },
   current: {
     type: Number,
@@ -27,28 +25,74 @@ const props = defineProps({
 const emit = defineEmits([
   'view',
   'edit',
-  'more-command',
+  'refresh',
   'current-change',
   'size-change'
 ])
 
-function getStatusTagType(status) {
+const getStatusTagType = (status) => {
   if (status === '1') return 'success'
   if (status === '2') return 'danger'
   return 'info'
 }
 
-function getRowIndex(index) {
+const getRowIndex = (index) => {
   return (props.current - 1) * props.size + index + 1
 }
 
+const handleEdit = (row) => {
+  if (row.billStatus === '1') {
+    ElMessage.warning('已完成单据不允许编辑')
+    return
+  }
+
+  emit('edit', row)
+}
+
+const copyBillNo = async (row) => {
+  try {
+    await navigator.clipboard.writeText(row.billNo || '')
+    ElMessage.success('报销单号已复制')
+  } catch (error) {
+    console.error('复制失败', error)
+    ElMessage.warning('复制失败，请手动复制')
+  }
+}
+
+const voidReimbursement = async (row) => {
+  try {
+    await ElMessageBox.confirm(`确认作废报销单 ${row.billNo} 吗？`, '提示', {
+      type: 'warning',
+      confirmButtonText: '确认',
+      cancelButtonText: '取消'
+    })
+    await voidReimbursementAPI(row.id)
+    ElMessage.success('作废成功')
+    emit('refresh')
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('作废失败', error)
+      ElMessage.error(error?.response?.data?.message || '作废失败')
+    }
+  }
+}
+
+const handleMoreCommand = (command, row) => {
+  if (command === 'copy') {
+    copyBillNo(row)
+    return
+  }
+
+  if (command === 'void') {
+    voidReimbursement(row)
+  }
+}
 </script>
 
 <template>
   <el-card shadow="never" class="table-card">
     <el-table
       :data="tableData"
-      v-loading="loading"
       row-key="id"
       border
       class="list-table"
@@ -63,12 +107,12 @@ function getRowIndex(index) {
             </el-tooltip>
 
             <el-tooltip content="编辑" placement="top">
-              <el-icon class="action-icon" @click="emit('edit', row)">
+              <el-icon class="action-icon" @click="handleEdit(row)">
                 <Edit />
               </el-icon>
             </el-tooltip>
 
-            <el-dropdown @command="(command) => emit('more-command', command, row)">
+            <el-dropdown @command="(command) => handleMoreCommand(command, row)">
               <el-icon class="action-icon more-icon">
                 <MoreFilled />
               </el-icon>
@@ -92,7 +136,7 @@ function getRowIndex(index) {
       <el-table-column prop="billNo" label="报销单号" min-width="160">
         <template #default="{ row }">
           <el-button link type="primary" class="link-button" @click="emit('view', row)">
-            {{ row.billNo || '-' }}
+            {{ row.billNo }}
           </el-button>
         </template>
       </el-table-column>
@@ -100,7 +144,7 @@ function getRowIndex(index) {
       <el-table-column label="单据状态" width="108" align="center">
         <template #default="{ row }">
           <el-tag :type="getStatusTagType(row.billStatus)" effect="light" round>
-            {{ row.billStatusName || '-' }}
+            {{ row.billStatusName }}
           </el-tag>
         </template>
       </el-table-column>

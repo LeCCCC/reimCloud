@@ -1,3 +1,4 @@
+//规则校验
 import dayjs from 'dayjs'
 
 export function validateBaseInfo(detailForm) {

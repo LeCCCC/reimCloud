@@ -1,3 +1,4 @@
+// 行程编辑弹窗
 <script setup>
 defineProps({
   visible: {
@@ -35,7 +36,7 @@ defineEmits(['update:visible', 'submit'])
   >
     <div class="dialog-tip">
       <div>仅可补录未从申请单带入或未产生费用的行程信息</div>
-	     <div>跨天跨城行程填写说明： 出发城市-到达城市：武汉-北京;出发日期-到达日期:1号~5号;1号~5号补助按北京匹配;</div>
+      <div>跨天跨城行程填写说明：出发城市-到达城市：武汉-北京；出发日期-到达日期：1号-5号；1号-5号补助按北京匹配。</div>
     </div>
 
     <el-form label-width="86px">
@@ -74,16 +75,25 @@ defineEmits(['update:visible', 'submit'])
         </el-form-item>
       </div>
 
-      <el-form-item label="出差日期">
-        <el-date-picker
-          v-model="form.dateRange"
-          type="daterange"
-          value-format="YYYY-MM-DD"
-          range-separator="至"
-          start-placeholder="选择日期"
-          end-placeholder="选择日期"
-        />
-      </el-form-item>
+      <div class="dialog-grid">
+        <el-form-item label="开始日期">
+          <el-date-picker
+            v-model="form.departureDate"
+            type="date"
+            value-format="YYYY-MM-DD"
+            placeholder="选择开始日期"
+          />
+        </el-form-item>
+
+        <el-form-item label="结束日期">
+          <el-date-picker
+            v-model="form.arrivalDate"
+            type="date"
+            value-format="YYYY-MM-DD"
+            placeholder="选择结束日期"
+          />
+        </el-form-item>
+      </div>
 
       <el-form-item label="行程说明">
         <el-input
@@ -126,6 +136,10 @@ defineEmits(['update:visible', 'submit'])
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
+}
+
+:deep(.el-date-editor.el-input) {
+  width: 100%;
 }
 
 @media (max-width: 980px) {

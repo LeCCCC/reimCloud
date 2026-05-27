@@ -1,8 +1,8 @@
 <script setup>
 import { onActivated, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { getReimbursementListAPI, voidReimbursementAPI } from '@/apis/reimbursement'
+import { ElMessage } from 'element-plus'
+import { getReimbursementListAPI } from '@/apis/reimbursement'
 import { useBusinessTypeOptions } from '@/composables/useReimbursementSelectOptions'
 import { reimbursementViewState } from '@/store/reimbursement'
 import ListFilterPanel from './components/ListFilterPanel.vue'
@@ -25,15 +25,8 @@ const createDefaultQueryForm = () => ({
 
 const queryForm = reactive(createDefaultQueryForm())
 
-const billStatusOptions = [
-  { label: '草稿', value: '0' },
-  { label: '已完成', value: '1' },
-  { label: '已作废', value: '2' }
-]
-
 const tableData = ref([])
 const total = ref(0)
-const loading = ref(false)
 const latestRefreshToken = ref(0)
 
 const {
@@ -44,9 +37,8 @@ const {
   loadCommonSelectOptions
 } = useBusinessTypeOptions()
 
-async function getList() {
-  loading.value = true
-
+//获取列表数据
+const getList = async () => {
   try {
     const res = await getReimbursementListAPI(queryForm)
     tableData.value = res?.data?.records || []
@@ -56,12 +48,11 @@ async function getList() {
   } catch (error) {
     console.error('获取报销单列表失败', error)
     ElMessage.error('获取报销单列表失败')
-  } finally {
-    loading.value = false
   }
 }
-
-async function getSelectOptions() {
+ 
+//获取筛选项
+const getSelectOptions = async () => {
   try {
     await loadCommonSelectOptions()
   } catch (error) {
@@ -69,90 +60,45 @@ async function getSelectOptions() {
     ElMessage.warning('筛选项加载失败，但列表仍可使用')
   }
 }
-
-function handleSearch() {
+//搜索和重置
+const handleSearch = () => {
   queryForm.current = 1
   getList()
 }
-function handleReset() {
+const handleReset = () => {
   Object.assign(queryForm, createDefaultQueryForm())
   getList()
 }
-
-function goToCreatePage() {
+//跳转到新增页
+const goToCreatePage = () => {
   router.push('/reimburse/detail')
 }
-
-function goToDetailPage(row, mode = 'view') {
+//跳转到详情页
+const goToDetailPage = (row, mode = 'view') => {
   router.push({
     path: `/reimburse/detail/${row.id}`,
     query: { mode }
   })
 }
-
-function handleAdd() {
+//新增、查看、编辑
+const handleAdd = () => {
   goToCreatePage()
 }
 
-function handleView(row) {
+const handleView = (row) => {
   goToDetailPage(row, 'view')
 }
 
-function handleEdit(row) {
-  if (row.billStatus === '1') {
-    ElMessage.warning('已完成单据不允许编辑')
-    return
-  }
-
+const handleEdit = (row) => {
   goToDetailPage(row, 'edit')
 }
-
-async function handleVoid(row) {
-  try {
-    await ElMessageBox.confirm(`确认作废报销单 ${row.billNo} 吗？`, '提示', {
-      type: 'warning',
-      confirmButtonText: '确认',
-      cancelButtonText: '取消'
-    })
-
-    await voidReimbursementAPI(row.id)
-    ElMessage.success('作废成功')
-    getList()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('作废失败', error)
-      ElMessage.error(error?.response?.data?.message || '作废失败')
-    }
-  }
-}
-
-async function copyBillNo(row) {
-  try {
-    await navigator.clipboard.writeText(row.billNo || '')
-    ElMessage.success('报销单号已复制')
-  } catch (error) {
-    console.error('复制失败', error)
-    ElMessage.warning('复制失败，请手动复制')
-  }
-}
-
-function handleMoreCommand(command, row) {
-  if (command === 'copy') {
-    copyBillNo(row)
-    return
-  }
-
-  if (command === 'void') {
-    handleVoid(row)
-  }
-}
-
-function handleCurrentChange(page) {
+//分页处理 页码和页面尺寸改变
+const handleCurrentChange = (page) => {
   queryForm.current = page
   getList()
 }
 
-function handleSizeChange(size) {
+const handleSizeChange = (size) => {
   queryForm.size = size
   queryForm.current = 1
   getList()
@@ -180,7 +126,6 @@ onActivated(() => {
       :department-options="departmentOptions"
       :employee-options="employeeOptions"
       :business-type-options="businessTypeSelectOptions"
-      :bill-status-options="billStatusOptions"
       @search="handleSearch"
       @reset="handleReset"
       @add="handleAdd"
@@ -188,13 +133,12 @@ onActivated(() => {
 
     <ListTablePanel
       :table-data="tableData"
-      :loading="loading"
       :current="queryForm.current"
       :size="queryForm.size"
       :total="total"
       @view="handleView"
       @edit="handleEdit"
-      @more-command="handleMoreCommand"
+      @refresh="getList"
       @current-change="handleCurrentChange"
       @size-change="handleSizeChange"
     />

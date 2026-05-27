@@ -1,5 +1,8 @@
+//备注模块
 <script setup>
-defineProps({
+import { ElMessageBox } from 'element-plus'
+
+const props = defineProps({
   open: {
     type: Boolean,
     default: true
@@ -14,7 +17,20 @@ defineProps({
   }
 })
 
-defineEmits(['toggle', 'update:remarks', 'clear'])
+const emit = defineEmits(['toggle', 'update:remarks'])
+
+async function handleClearRemarks() {
+  if (props.isReadonly || !props.remarks) return
+
+  try {
+    await ElMessageBox.confirm('确定删除当前备注内容吗？', '提示', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
+    })
+    emit('update:remarks', '')
+  } catch {}
+}
 </script>
 
 <template>
@@ -22,7 +38,7 @@ defineEmits(['toggle', 'update:remarks', 'clear'])
     <div class="section-header" @click="$emit('toggle')">
       <div class="section-title">备注信息</div>
       <div class="section-actions" @click.stop>
-        <el-button v-if="!isReadonly && remarks" link type="danger" @click="$emit('clear')">删除备注</el-button>
+        <el-button v-if="!isReadonly && remarks" link type="danger" @click="handleClearRemarks">删除备注</el-button>
         <div class="section-switch">{{ open ? '收起' : '展开' }}</div>
       </div>
     </div>
@@ -32,8 +48,6 @@ defineEmits(['toggle', 'update:remarks', 'clear'])
         :disabled="isReadonly"
         type="textarea"
         :rows="5"
-        maxlength="1000"
-        show-word-limit
         placeholder="请输入备注信息"
         @update:model-value="$emit('update:remarks', $event)"
       />
